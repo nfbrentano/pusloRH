@@ -32,6 +32,7 @@ const Builder: React.FC = () => {
   const [openDate, setOpenDate] = useState('');
   const [closeDate, setCloseDate] = useState('');
   const [expectedResponses, setExpectedResponses] = useState<number>(0);
+  const [isActive, setIsActive] = useState(true);
   
   const [questions, setQuestions] = useState<Omit<Question, 'surveyId'>[]>([
     {
@@ -54,6 +55,7 @@ const Builder: React.FC = () => {
         setOpenDate(existingSurvey.openDate);
         setCloseDate(existingSurvey.closeDate);
         setExpectedResponses(existingSurvey.expectedResponses || 0);
+        setIsActive(existingSurvey.isActive !== false); // Default to true
         
         if (existingQuestions.length > 0) {
           setQuestions(existingQuestions.map(({ surveyId, ...q }) => q));
@@ -91,7 +93,7 @@ const Builder: React.FC = () => {
     }
 
     if (id) {
-      updateSurvey(id, { title, description, openDate, closeDate, expectedResponses }, questions);
+      updateSurvey(id, { title, description, openDate, closeDate, expectedResponses, isActive }, questions);
     } else {
       const newSurvey = {
         id: Math.random().toString(36).substr(2, 9),
@@ -100,6 +102,7 @@ const Builder: React.FC = () => {
         openDate,
         closeDate,
         expectedResponses,
+        isActive: true,
         createdAt: new Date().toISOString(),
       };
       addSurvey(newSurvey, questions);
@@ -113,6 +116,20 @@ const Builder: React.FC = () => {
       {/* Top Bar for Builder */}
       <div className="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-8 h-16 bg-surface/80 backdrop-blur-md md:pl-72 pointer-events-none">
         <div className="flex items-center gap-4 ml-auto pointer-events-auto">
+          {id && (
+            <button 
+              type="button"
+              onClick={() => setIsActive(!isActive)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all font-medium border ${
+                isActive 
+                  ? 'text-slate-500 border-outline-variant/30 hover:bg-slate-50' 
+                  : 'text-success bg-success/5 border-success/20 hover:bg-success/10'
+              }`}
+            >
+              <div className={`w-2 h-2 rounded-full ${isActive ? 'bg-error' : 'bg-success animate-pulse'}`}></div>
+              <span>{isActive ? t('builder.inactivate_survey') : t('builder.activate_survey')}</span>
+            </button>
+          )}
           <button 
             type="button"
             onClick={() => navigate('/dashboard')}

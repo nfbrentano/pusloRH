@@ -25,22 +25,28 @@ const Respondent: React.FC = () => {
   const open = parseISO(survey.openDate);
   const close = endOfDay(parseISO(survey.closeDate));
   
-  const isActive = isWithinInterval(today, { start: open, end: close });
+  const isActiveDate = isWithinInterval(today, { start: open, end: close });
+  const isActuallyActive = survey.isActive !== false && isActiveDate;
 
-  if (!isActive) {
+  if (!isActuallyActive) {
+    const isInactive = survey.isActive === false;
     return (
       <div className="min-h-screen flex items-center justify-center bg-surface p-6">
         <div className="bg-surface-container-lowest p-12 rounded-[2.5rem] shadow-xl max-w-lg text-center space-y-6">
           <div className="w-20 h-20 bg-error-container text-error rounded-full flex items-center justify-center mx-auto">
             <Lock className="w-10 h-10" />
           </div>
-          <h2 className="text-3xl font-extrabold font-headline text-on-surface">{t('respondent.out_of_date')}</h2>
+          <h2 className="text-3xl font-extrabold font-headline text-on-surface">
+            {isInactive ? t('respondent.inactive_title') : t('respondent.out_of_date')}
+          </h2>
           <p className="text-on-surface-variant text-lg">
-            {t('respondent.out_of_date_description')}
+            {isInactive ? t('respondent.inactive_description') : t('respondent.out_of_date_description')}
           </p>
-          <p className="text-sm text-slate-400">
-            {t('respondent.period')}: {survey.openDate} {t('respondent.survey_to_date') || 'até'} {survey.closeDate}
-          </p>
+          {!isInactive && (
+            <p className="text-sm text-slate-400">
+              {t('respondent.period')}: {survey.openDate} {t('respondent.survey_to_date') || 'até'} {survey.closeDate}
+            </p>
+          )}
         </div>
       </div>
     );

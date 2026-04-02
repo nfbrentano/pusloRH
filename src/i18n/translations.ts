@@ -40,6 +40,7 @@ export const translations = {
       status_open: 'Em Aberto',
       launch_title: 'Lançar um Pulso',
       launch_description: 'Crie uma pesquisa rápida de 5 perguntas para checar o humor do seu time.',
+      status_inactive: 'Inativa',
       get_started: 'Começar',
     },
     builder: {
@@ -63,6 +64,8 @@ export const translations = {
       allow_comment: 'Permitir comentário',
       add_question: 'Adicionar Nova Pergunta',
       total_questions: '{count} Perguntas no total',
+      inactivate_survey: 'Inativar Pesquisa',
+      activate_survey: 'Reativar Pesquisa',
     },
     respondent: {
       anonymous: 'Esta pesquisa é anônima. Suas respostas serão tratadas com total confidencialidade.',
@@ -91,6 +94,8 @@ export const translations = {
       rating_5: 'Excelente',
       slider_min: 'Não concordo',
       slider_max: 'Concordo totalmente',
+      inactive_title: 'Pesquisa Inativa',
+      inactive_description: 'Esta pesquisa foi desativada pelo administrador e não está mais recebendo respostas.',
     }
   },
   en: {
@@ -132,6 +137,7 @@ export const translations = {
       status_open: 'Open',
       launch_title: 'Launch a Pulse',
       launch_description: 'Create a quick 5-question pulse survey to check the mood of your team.',
+      status_inactive: 'Inactive',
       get_started: 'Get started',
     },
     builder: {
@@ -155,6 +161,8 @@ export const translations = {
       allow_comment: 'Allow text comment',
       add_question: 'Add New Question',
       total_questions: '{count} Questions Total',
+      inactivate_survey: 'Inactivate Survey',
+      activate_survey: 'Reactivate Survey',
     },
     respondent: {
       anonymous: 'This survey is anonymous. Your responses will be treated with full confidentiality.',
@@ -183,6 +191,8 @@ export const translations = {
       rating_5: 'Excellent',
       slider_min: 'Strongly disagree',
       slider_max: 'Strongly agree',
+      inactive_title: 'Survey Inactive',
+      inactive_description: 'This survey has been deactivated by the administrator and is no longer receiving responses.',
     }
   }
 };

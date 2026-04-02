@@ -52,6 +52,7 @@ const Dashboard: React.FC = () => {
   };
   
   const getStatus = (survey: any) => {
+    if (survey.isActive === false) return 'inactive';
     const today = startOfDay(new Date());
     const open = parseISO(survey.openDate);
     const close = endOfDay(parseISO(survey.closeDate));
@@ -130,16 +131,23 @@ const Dashboard: React.FC = () => {
       {/* Surveys Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 px-4">
         {filteredSurveys.map((survey) => {
-          const isActive = getStatus(survey) === 'open';
+          const status = getStatus(survey);
+          const isActive = status === 'open';
+          const isInactive = status === 'inactive';
+          
           return (
-            <div key={survey.id} className="group bg-surface-container-lowest rounded-3xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 relative overflow-hidden">
+            <div key={survey.id} className={`group rounded-3xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 relative overflow-hidden ${
+              isInactive ? 'bg-surface-container-low opacity-80' : 'bg-surface-container-lowest'
+            }`}>
               <div className="flex justify-between items-start mb-6">
                 <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
                   isActive 
                     ? 'bg-secondary-container text-on-secondary-container' 
-                    : 'bg-surface-container-high text-on-surface-variant'
+                    : isInactive
+                      ? 'bg-slate-200 text-slate-600'
+                      : 'bg-surface-container-high text-on-surface-variant'
                 }`}>
-                  {isActive ? t('dashboard.status_open') : t('dashboard.filter_closed')}
+                  {isActive ? t('dashboard.status_open') : isInactive ? t('dashboard.status_inactive') : t('dashboard.filter_closed')}
                 </span>
               <div className="flex space-x-1">
                 <button 

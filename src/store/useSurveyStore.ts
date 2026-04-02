@@ -18,6 +18,7 @@ export interface Survey {
   openDate: string;
   closeDate: string;
   expectedResponses: number;
+  isActive: boolean;
   createdAt: string;
 }
 
@@ -59,6 +60,7 @@ export const useSurveyStore = create<SurveyState>()(
           openDate: '2026-01-01',
           closeDate: '2026-12-31',
           expectedResponses: 1500,
+          isActive: true,
           createdAt: new Date().toISOString(),
         },
         {
@@ -68,6 +70,7 @@ export const useSurveyStore = create<SurveyState>()(
           openDate: '2026-01-01',
           closeDate: '2026-04-30',
           expectedResponses: 1000,
+          isActive: true,
           createdAt: new Date().toISOString(),
         }
       ],
@@ -99,8 +102,12 @@ export const useSurveyStore = create<SurveyState>()(
           ...q,
           surveyId: survey.id
         }));
+        const newSurvey = {
+          ...survey,
+          isActive: survey.isActive ?? true,
+        };
         set((state) => ({
-          surveys: [survey, ...state.surveys],
+          surveys: [newSurvey, ...state.surveys],
           questions: [...state.questions, ...newQuestions]
         }));
       },
