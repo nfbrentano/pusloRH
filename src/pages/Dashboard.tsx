@@ -4,11 +4,14 @@ import Layout from '../components/Layout';
 import { Calendar, Edit, Filter, Link, PlusCircle, Download } from 'lucide-react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { useLocaleStore } from '../store/useLocaleStore';
+import { isWithinInterval, parseISO, startOfDay, endOfDay } from 'date-fns';
+import { useState } from 'react';
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
-  const { surveys, getSurveyResponses } = useSurveyStore();
+  const { surveys, getSurveyResponses, searchQuery, statusFilter, setStatusFilter } = useSurveyStore();
   const { t } = useLocaleStore();
+  const [isFilterMenuOpen, setIsFilterMenuOpen] = useState(false);
 
   const handleGenerateLink = (id: string) => {
     const url = `${window.location.origin}/responder/${id}`;
@@ -47,6 +50,20 @@ const Dashboard: React.FC = () => {
     link.click();
     document.body.removeChild(link);
   };
+  
+  const getStatus = (survey: any) => {
+    const today = startOfDay(new Date());
+    const open = parseISO(survey.openDate);
+    const close = endOfDay(parseISO(survey.closeDate));
+    return isWithinInterval(today, { start: open, end: close }) ? 'open' : 'closed';
+  };
+
+  const filteredSurveys = surveys.filter(survey => {
+    const matchesSearch = survey.title.toLowerCase().includes(searchQuery.toLowerCase());
+    const surveyStatus = getStatus(survey);
+    const matchesStatus = statusFilter === 'all' || surveyStatus === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
 
   return (
     <Layout title={t('sidebar.dashboard')}>
@@ -60,11 +77,46 @@ const Dashboard: React.FC = () => {
             {t('dashboard.title').split('{org}')[1]}
           </h2>
         </div>
-        <div className="flex space-x-3">
-          <button className="bg-white text-primary border border-primary/10 px-6 py-3 rounded-xl font-bold flex items-center space-x-2 shadow-sm hover:bg-surface-container-low transition-all">
-            <Filter className="w-5 h-5" />
-            <span>{t('dashboard.filter')}</span>
-          </button>
+        <div className="flex space-x-3 relative">
+          <div className="relative">
+            <button 
+              onClick={() => setIsFilterMenuOpen(!isFilterMenuOpen)}
+              className="bg-white text-primary border border-primary/10 px-6 py-3 rounded-xl font-bold flex items-center space-x-2 shadow-sm hover:bg-surface-container-low transition-all"
+            >
+              <Filter className="w-5 h-5" />
+              <span>{t('dashboard.filter')}</span>
+              {statusFilter !== 'all' && (
+                <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+              )}
+            </button>
+            
+            {isFilterMenuOpen && (
+              <div className="absolute right-0 mt-2 w-48 bg-white border border-outline-variant/20 rounded-2xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="p-2 space-y-1">
+                  {[
+                    { id: 'all', label: t('dashboard.filter_all') },
+                    { id: 'open', label: t('dashboard.filter_open') },
+                    { id: 'closed', label: t('dashboard.filter_closed') },
+                  ].map((option) => (
+                    <button
+                      key={option.id}
+                      onClick={() => {
+                        setStatusFilter(option.id as any);
+                        setIsFilterMenuOpen(false);
+                      }}
+                      className={`w-full text-left px-4 py-2.5 rounded-xl text-sm font-bold transition-colors ${
+                        statusFilter === option.id 
+                          ? 'bg-primary text-white' 
+                          : 'text-on-surface hover:bg-surface-container-low'
+                      }`}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
           <RouterLink 
             to="/builder"
             className="bg-primary text-white px-6 py-3 rounded-xl font-bold flex items-center space-x-2 shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all"
@@ -77,12 +129,18 @@ const Dashboard: React.FC = () => {
 
       {/* Surveys Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 px-4">
-        {surveys.map((survey) => (
-          <div key={survey.id} className="group bg-surface-container-lowest rounded-3xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 relative overflow-hidden">
-            <div className="flex justify-between items-start mb-6">
-              <span className="px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container text-[10px] font-bold uppercase tracking-wider">
-                {t('dashboard.status_open')}
-              </span>
+        {filteredSurveys.map((survey) => {
+          const isActive = getStatus(survey) === 'open';
+          return (
+            <div key={survey.id} className="group bg-surface-container-lowest rounded-3xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 relative overflow-hidden">
+              <div className="flex justify-between items-start mb-6">
+                <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                  isActive 
+                    ? 'bg-secondary-container text-on-secondary-container' 
+                    : 'bg-surface-container-high text-on-surface-variant'
+                }`}>
+                  {isActive ? t('dashboard.status_open') : t('dashboard.filter_closed')}
+                </span>
               <div className="flex space-x-1">
                 <button 
                   onClick={() => navigate(`/builder/${survey.id}`)}
@@ -158,7 +216,8 @@ const Dashboard: React.FC = () => {
               <span>{t('dashboard.generate_link')}</span>
             </button>
           </div>
-        ))}
+          );
+        })}
 
         {/* Action Card */}
         <RouterLink 

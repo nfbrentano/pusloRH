@@ -1,5 +1,6 @@
 import { Search, Bell, HelpCircle, Menu, Languages } from 'lucide-react';
 import { useLocaleStore } from '../store/useLocaleStore';
+import { useSurveyStore } from '../store/useSurveyStore';
 
 interface HeaderProps {
   title: string;
@@ -8,6 +9,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ title, onMenuClick }) => {
   const { locale, setLocale, t } = useLocaleStore();
+  const { searchQuery, setSearchQuery } = useSurveyStore();
 
   const toggleLocale = () => {
     setLocale(locale === 'pt' ? 'en' : 'pt');
@@ -36,6 +38,8 @@ const Header: React.FC<HeaderProps> = ({ title, onMenuClick }) => {
             className="bg-transparent border-none focus:ring-0 text-sm w-32 xl:w-48 text-on-surface" 
             placeholder={t('common.search')} 
             type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
         

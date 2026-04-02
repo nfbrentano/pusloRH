@@ -34,8 +34,12 @@ interface SurveyState {
   surveys: Survey[];
   questions: Question[];
   responses: Response[];
+  searchQuery: string;
+  statusFilter: 'all' | 'open' | 'closed';
   
   // Actions
+  setSearchQuery: (query: string) => void;
+  setStatusFilter: (status: 'all' | 'open' | 'closed') => void;
   addSurvey: (survey: Survey, questions: Omit<Question, 'surveyId'>[]) => void;
   deleteSurvey: (id: string) => void;
   addResponse: (response: Omit<Response, 'id' | 'createdAt'>) => void;
@@ -84,6 +88,11 @@ export const useSurveyStore = create<SurveyState>()(
         }
       ],
       responses: [],
+      searchQuery: '',
+      statusFilter: 'all',
+
+      setSearchQuery: (query) => set({ searchQuery: query }),
+      setStatusFilter: (status) => set({ statusFilter: status }),
 
       addSurvey: (survey, questionsData) => {
         const newQuestions = questionsData.map(q => ({
