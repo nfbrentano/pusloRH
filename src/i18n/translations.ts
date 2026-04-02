@@ -23,6 +23,7 @@ export const translations = {
       surveys: 'Pesquisas',
       new_survey: 'Nova Pesquisa',
       employees: 'Colaboradores',
+      departments: 'Departamentos',
       admin: 'Admin Master',
     },
     dashboard: {
@@ -153,7 +154,8 @@ export const translations = {
       management: 'Gestão de Talentos',
       subtitle: 'Acompanhe e gerencie {count} colaboradores.',
       search_placeholder: 'Buscar por nome ou e-mail...',
-      add_new: 'Novo Colaborador',
+      add_new: 'Admitir Talento',
+      recruitment: 'Atração & Seleção',
     },
   },
   en: {
@@ -177,6 +179,7 @@ export const translations = {
       surveys: 'Surveys',
       new_survey: 'New Survey',
       employees: 'Employees',
+      departments: 'Departments',
       admin: 'Admin Master',
     },
     dashboard: {
@@ -306,7 +309,8 @@ export const translations = {
       management: 'Talent Management',
       subtitle: 'Track and manage {count} employees.',
       search_placeholder: 'Search by name or email...',
-      add_new: 'Add New Employee',
+      add_new: 'Hire Talent',
+      recruitment: 'Recruitment & Selection',
     },
   },
 };

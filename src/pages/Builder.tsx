@@ -225,6 +225,8 @@ const Builder: React.FC = () => {
                 {t('builder.survey_title')}
               </label>
               <input
+                id="survey-title"
+                name="survey-title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 className="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary/20"
@@ -311,6 +313,8 @@ const Builder: React.FC = () => {
                     {t('builder.question_label')} {String(index + 1).padStart(2, '0')}
                   </label>
                   <input
+                    id={`q-text-${q.id}`}
+                    name={`q-text-${q.id}`}
                     value={q.text}
                     onChange={(e) => updateQuestion(q.id, { text: e.target.value })}
                     className="w-full text-lg font-semibold bg-transparent border-none p-0 focus:ring-0 text-on-surface placeholder:text-slate-300"

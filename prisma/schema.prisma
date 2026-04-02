@@ -8,11 +8,22 @@ datasource db {
 }
 
 model User {
+  id           String      @id @default(uuid())
+  email        String      @unique
+  name         String
+  role         String      // 'ADMIN', 'HR', or 'USER'
+  avatar       String?
+  status       String      @default("Active") // 'Active' or 'Inactive'
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id])
+  createdAt    DateTime    @default(now())
+}
+
+model Department {
   id        String   @id @default(uuid())
-  email     String   @unique
-  name      String
-  role      String   // 'ADMIN' or 'USER'
-  avatar    String?
+  name      String   @unique
+  color     String   @default("#3b82f6") // Default primary blue
+  users     User[]
   createdAt DateTime @default(now())
 }
 
@@ -45,7 +56,7 @@ model Response {
   survey     Survey   @relation(fields: [surveyId], references: [id])
   questionId String
   question   Question @relation(fields: [questionId], references: [id])
-  value      String   // Using String to handle all types (Binary, Likert, NPS)
+  value      String
   comment    String?
   createdAt  DateTime @default(now())
 }

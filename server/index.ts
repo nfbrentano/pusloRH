@@ -11,7 +11,7 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
-// --- TYPES (Internal to Backend) ---
+// --- TYPES ---
 interface QuestionInput {
   text: string;
   type: string;
@@ -24,16 +24,32 @@ interface ResponseInput {
   comment?: string;
 }
 
-// --- SEED INITIAL USER (Demo Purposes) ---
+// --- SEED INITIAL DATA ---
 async function seed() {
+  // Seed Departments
+  const departments = ['RH', 'Engenharia', 'Vendas', 'Marketing', 'Operações'];
+  const colors = ['#ec4899', '#3b82f6', '#f59e0b', '#10b981', '#8b5cf6'];
+
+  for (let i = 0; i < departments.length; i++) {
+    const dept = await prisma.department.findUnique({ where: { name: departments[i] } });
+    if (!dept) {
+      await prisma.department.create({
+        data: { name: departments[i], color: colors[i] },
+      });
+    }
+  }
+
+  // Seed Admin
   const adminEmail = 'admin@pulsorh.com';
   const user = await prisma.user.findUnique({ where: { email: adminEmail } });
   if (!user) {
+    const rhDept = await prisma.department.findUnique({ where: { name: 'RH' } });
     await prisma.user.create({
       data: {
         email: adminEmail,
         name: 'Admin Master',
         role: 'ADMIN',
+        departmentId: rhDept?.id,
         avatar:
           'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1287&auto=format&fit=crop',
       },
@@ -45,11 +61,103 @@ seed();
 
 // --- ROUTES ---
 
-// GET: All Surveys
+// USERS
+app.get('/api/users', async (_req, res) => {
+  try {
+    const users = await prisma.user.findMany({
+      include: { department: true },
+      orderBy: { createdAt: 'desc' },
+    });
+    res.json(users);
+  } catch {
+    res.status(500).json({ error: 'Failed to fetch users' });
+  }
+});
+
+app.post('/api/users', async (req, res) => {
+  try {
+    const { email, name, role, departmentId, avatar } = req.body;
+    const user = await prisma.user.create({
+      data: { email, name, role, departmentId, avatar },
+      include: { department: true },
+    });
+    res.status(201).json(user);
+  } catch (error) {
+    console.error('Error creating user:', error);
+    res.status(500).json({ error: 'Failed to create user' });
+  }
+});
+
+app.put('/api/users/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, email, role, departmentId, status } = req.body;
+    const user = await prisma.user.update({
+      where: { id },
+      data: { name, email, role, departmentId, status },
+      include: { department: true },
+    });
+    res.json(user);
+  } catch {
+    res.status(500).json({ error: 'Failed to update user' });
+  }
+});
+
+app.delete('/api/users/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await prisma.user.delete({ where: { id } });
+    res.status(204).send();
+  } catch {
+    res.status(500).json({ error: 'Failed to delete user' });
+  }
+});
+
+// DEPARTMENTS
+app.get('/api/departments', async (_req, res) => {
+  try {
+    const depts = await prisma.department.findMany({
+      include: { _count: { select: { users: true } } },
+      orderBy: { name: 'asc' },
+    });
+    res.json(depts);
+  } catch {
+    res.status(500).json({ error: 'Failed to fetch departments' });
+  }
+});
+
+app.post('/api/departments', async (req, res) => {
+  try {
+    const { name, color } = req.body;
+    const dept = await prisma.department.create({
+      data: { name, color },
+    });
+    res.status(201).json(dept);
+  } catch {
+    res.status(500).json({ error: 'Failed to create department' });
+  }
+});
+
+app.delete('/api/departments/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    // Check if department has users
+    const count = await prisma.user.count({ where: { departmentId: id } });
+    if (count > 0) return res.status(400).json({ error: 'Cannot delete department with users' });
+
+    await prisma.department.delete({ where: { id } });
+    res.status(204).send();
+  } catch {
+    res.status(500).json({ error: 'Failed to delete department' });
+  }
+});
+
+// SURVEYS
 app.get('/api/surveys', async (_req, res) => {
   try {
     const surveys = await prisma.survey.findMany({
       include: { questions: true },
+      orderBy: { createdAt: 'desc' },
     });
     res.json(surveys);
   } catch {
@@ -57,7 +165,6 @@ app.get('/api/surveys', async (_req, res) => {
   }
 });
 
-// GET: Single Survey
 app.get('/api/surveys/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -72,7 +179,6 @@ app.get('/api/surveys/:id', async (req, res) => {
   }
 });
 
-// POST: Create Survey
 app.post('/api/surveys', async (req, res) => {
   try {
     const { title, description, openDate, closeDate, expectedResponses, questions } = req.body;
@@ -83,7 +189,7 @@ app.post('/api/surveys', async (req, res) => {
         description,
         openDate,
         closeDate,
-        expectedResponses,
+        expectedResponses: parseInt(String(expectedResponses)) || 0,
         questions: {
           create: (questions as QuestionInput[]).map((q) => ({
             text: q.text,
@@ -96,19 +202,17 @@ app.post('/api/surveys', async (req, res) => {
     });
     res.status(201).json(survey);
   } catch (error) {
-    console.error(error);
+    console.error('Error creating survey:', error);
     res.status(500).json({ error: 'Failed to create survey' });
   }
 });
 
-// PUT: Update Survey
 app.put('/api/surveys/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const { title, description, openDate, closeDate, expectedResponses, questions, isActive } =
       req.body;
 
-    // Delete existing questions and recreate (simplified update strategy)
     await prisma.question.deleteMany({ where: { surveyId: id } });
 
     const survey = await prisma.survey.update({
@@ -118,7 +222,7 @@ app.put('/api/surveys/:id', async (req, res) => {
         description,
         openDate,
         closeDate,
-        expectedResponses,
+        expectedResponses: parseInt(String(expectedResponses)) || 0,
         isActive,
         questions: {
           create: (questions as QuestionInput[]).map((q) => ({
@@ -131,15 +235,15 @@ app.put('/api/surveys/:id', async (req, res) => {
       include: { questions: true },
     });
     res.json(survey);
-  } catch {
+  } catch (error) {
+    console.error('Error updating survey:', error);
     res.status(500).json({ error: 'Failed to update survey' });
   }
 });
 
-// POST: Submit Response
 app.post('/api/responses', async (req, res) => {
   try {
-    const { surveyId, responses } = req.body; // responses is array of { questionId, value, comment }
+    const { surveyId, responses } = req.body;
 
     const createdResponses = await Promise.all(
       (responses as ResponseInput[]).map((r) =>
@@ -159,7 +263,6 @@ app.post('/api/responses', async (req, res) => {
   }
 });
 
-// GET: Survey Statistics (Responses collected)
 app.get('/api/surveys/:id/stats', async (req, res) => {
   try {
     const { id } = req.params;

@@ -19,6 +19,7 @@ import {
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { useLocaleStore } from '../store/useLocaleStore';
 import { isWithinInterval, parseISO, startOfDay, endOfDay } from 'date-fns';
+import { ROUTES } from '../routes/config';
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -153,7 +154,7 @@ const Dashboard: React.FC = () => {
               )}
             </div>
             <RouterLink
-              to="/builder"
+              to={ROUTES.BUILDER_NEW}
               className="bg-primary text-white px-6 py-3 rounded-xl font-bold flex items-center space-x-2 shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all"
             >
               <PlusCircle className="w-5 h-5" />
@@ -336,7 +337,7 @@ const Dashboard: React.FC = () => {
 
         {isAdmin && (
           <RouterLink
-            to="/builder"
+            to={ROUTES.BUILDER_NEW}
             className="group bg-surface-container-low border-2 border-dashed border-outline-variant/30 rounded-3xl p-6 flex flex-col items-center justify-center text-center space-y-4 hover:border-primary/50 transition-all"
           >
             <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center text-primary shadow-sm">

@@ -1,25 +1,48 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/useAuthStore';
 import { useLocaleStore } from '../store/useLocaleStore';
 import { ROUTES } from '../routes/config';
 import type { UserRole } from '../types';
-import { Mail, Lock, LogIn, ShieldCheck, User as UserIcon, Briefcase } from 'lucide-react';
+import {
+  Mail,
+  Lock,
+  LogIn,
+  ShieldCheck,
+  User as UserIcon,
+  Briefcase,
+  AlertCircle,
+} from 'lucide-react';
 
 const Login: React.FC = () => {
   const { t } = useLocaleStore();
-  const { login } = useAuthStore();
+  const { login, isAuthenticated, checkSession } = useAuthStore();
   const navigate = useNavigate();
   const location = useLocation();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState<UserRole>('ADMIN');
+  const [error, setError] = useState<string | null>(null);
 
   const from = location.state?.from?.pathname || ROUTES.DASHBOARD;
 
+  // Redirect if already authenticated and session is valid
+  useEffect(() => {
+    if (isAuthenticated && checkSession()) {
+      navigate(ROUTES.DASHBOARD, { replace: true });
+    }
+  }, [isAuthenticated, checkSession, navigate]);
+
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+
+    // Simple validation
+    if (!email || !password) {
+      setError(t('auth.error_message') || 'Por favor, preencha todos os campos.');
+      return;
+    }
 
     // In a real app, this would call an API
     // For demo, we just use the selected role
@@ -34,6 +57,8 @@ const Login: React.FC = () => {
             ? 'hr@pulsorh.com'
             : 'user@pulsorh.com'),
       role,
+      status: 'Active',
+      createdAt: new Date().toISOString(),
       avatar:
         role === 'ADMIN'
           ? 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1287&auto=format&fit=crop'
@@ -52,9 +77,9 @@ const Login: React.FC = () => {
         <div className="p-8 md:p-12">
           {/* Logo Section */}
           <div className="flex flex-col items-center mb-10">
-            <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center shadow-xl shadow-primary/30 mb-4 animate-float">
+            <div className="w-20 h-20 rounded-xl bg-primary flex items-center justify-center shadow-2xl shadow-primary/30 mb-6 animate-float">
               <span
-                className="material-symbols-outlined text-white text-4xl"
+                className="material-symbols-outlined text-white text-5xl"
                 style={{ fontVariationSettings: "'FILL' 1" }}
               >
                 pulse_alert
@@ -65,6 +90,14 @@ const Login: React.FC = () => {
           </div>
 
           <form onSubmit={handleLogin} className="space-y-6">
+            {/* Error Message */}
+            {error && (
+              <div className="bg-error/10 text-error p-4 rounded-2xl flex items-center gap-3 animate-shake">
+                <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                <p className="text-sm font-bold">{error}</p>
+              </div>
+            )}
+
             {/* Role Selection */}
             <div className="space-y-3">
               <label className="text-xs font-black uppercase tracking-widest text-slate-400 block ml-1">
@@ -126,11 +159,16 @@ const Login: React.FC = () => {
               <div className="relative">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                 <input
+                  id="email"
+                  name="email"
+                  autoComplete="username"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder={t('auth.email_placeholder')}
-                  className="w-full bg-slate-50 border-none rounded-2xl pl-12 pr-4 py-4 focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+                  className={`w-full bg-slate-50 border-none rounded-2xl pl-12 pr-4 py-4 focus:ring-2 transition-all font-medium ${
+                    error ? 'focus:ring-error/20' : 'focus:ring-primary/20'
+                  }`}
                 />
               </div>
             </div>
@@ -143,11 +181,16 @@ const Login: React.FC = () => {
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                 <input
+                  id="password"
+                  name="password"
+                  autoComplete="current-password"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder={t('auth.password_placeholder')}
-                  className="w-full bg-slate-50 border-none rounded-2xl pl-12 pr-4 py-4 focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+                  className={`w-full bg-slate-50 border-none rounded-2xl pl-12 pr-4 py-4 focus:ring-2 transition-all font-medium ${
+                    error ? 'focus:ring-error/20' : 'focus:ring-primary/20'
+                  }`}
                 />
               </div>
             </div>

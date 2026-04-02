@@ -1,17 +1,27 @@
-import React from 'react';
-import { Search, Bell, HelpCircle, Menu, Languages } from 'lucide-react';
+import { Bell, Menu, Languages, PanelLeftClose, PanelLeft } from 'lucide-react';
 import { useLocaleStore } from '../store/useLocaleStore';
-import { useSurveyStore } from '../store/useSurveyStore';
 import { useAuthStore } from '../store/useAuthStore';
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
 
 interface HeaderProps {
   title: string;
   onMenuClick?: () => void;
+  onToggleCollapse?: () => void;
+  isSidebarCollapsed?: boolean;
 }
 
-const Header: React.FC<HeaderProps> = ({ title, onMenuClick }) => {
-  const { locale, setLocale, t } = useLocaleStore();
-  const { searchQuery, setSearchQuery } = useSurveyStore();
+const Header: React.FC<HeaderProps> = ({
+  title,
+  onMenuClick,
+  onToggleCollapse,
+  isSidebarCollapsed = false,
+}) => {
+  const { locale, setLocale } = useLocaleStore();
   const { user } = useAuthStore();
 
   const toggleLocale = () => {
@@ -19,7 +29,12 @@ const Header: React.FC<HeaderProps> = ({ title, onMenuClick }) => {
   };
 
   return (
-    <header className="fixed top-0 z-50 flex justify-between items-center px-6 md:px-8 h-16 w-full md:pl-72 bg-surface/80 backdrop-blur-md shadow-sm">
+    <header
+      className={cn(
+        'fixed top-0 z-50 flex justify-between items-center px-6 md:px-8 h-16 transition-all duration-300 bg-surface/80 backdrop-blur-md border-b border-outline-variant/10 shadow-sm',
+        isSidebarCollapsed ? 'w-full left-0' : 'w-full md:left-72 md:w-[calc(100%-18rem)]'
+      )}
+    >
       <div className="flex items-center space-x-4">
         <button
           onClick={onMenuClick}
@@ -28,29 +43,29 @@ const Header: React.FC<HeaderProps> = ({ title, onMenuClick }) => {
         >
           <Menu className="w-6 h-6" />
         </button>
-        <h1 className="text-xl md:text-2xl font-bold tracking-tighter text-blue-800 truncate max-w-[200px] md:max-w-none">
+
+        {/* Desktop Collapse Toggle */}
+        <button
+          onClick={onToggleCollapse}
+          className="hidden md:flex p-2 -ml-2 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-all"
+          title={isSidebarCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
+        >
+          {isSidebarCollapsed ? (
+            <PanelLeft className="w-5 h-5" />
+          ) : (
+            <PanelLeftClose className="w-5 h-5" />
+          )}
+        </button>
+
+        <h1 className="text-xl md:text-2xl font-bold tracking-tighter text-blue-900 truncate max-w-[200px] md:max-w-none">
           {title}
         </h1>
       </div>
 
       <div className="flex items-center space-x-2 md:space-x-6">
-        <div className="hidden lg:flex items-center bg-surface-container px-4 py-2 rounded-full">
-          <Search className="text-outline mr-2 w-5 h-5" />
-          <input
-            className="bg-transparent border-none focus:ring-0 text-sm w-32 xl:w-48 text-on-surface"
-            placeholder={t('common.search')}
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-
         <div className="flex items-center space-x-1 md:space-x-4">
           <button className="p-2 rounded-full hover:bg-slate-100 transition-colors hidden sm:flex">
             <Bell className="text-slate-600 w-5 h-5" />
-          </button>
-          <button className="p-2 rounded-full hover:bg-slate-100 transition-colors hidden sm:flex">
-            <HelpCircle className="text-slate-600 w-5 h-5" />
           </button>
 
           {/* Language Switcher */}
@@ -62,7 +77,7 @@ const Header: React.FC<HeaderProps> = ({ title, onMenuClick }) => {
             <span className="uppercase">{locale}</span>
           </button>
 
-          <div className="w-8 h-8 md:w-9 md:h-9 rounded-full overflow-hidden border-2 border-primary/20">
+          <div className="w-8 h-8 md:w-9 md:h-9 rounded-full overflow-hidden border-2 border-primary/20 shadow-sm">
             <img
               alt="User avatar"
               className="w-full h-full object-cover"

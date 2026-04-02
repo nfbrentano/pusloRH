@@ -9,6 +9,8 @@ import Dashboard from '../pages/Dashboard';
 import Builder from '../pages/Builder';
 import Respondent from '../pages/Respondent';
 import Employees from '../pages/Employees';
+import AddEmployee from '../pages/AddEmployee';
+import DepartmentHub from '../pages/DepartmentHub';
 
 import type { UserRole } from '../types';
 
@@ -27,7 +29,7 @@ const routes: RouteConfig[] = [
   { path: ROUTES.DASHBOARD, element: <Dashboard />, isPrivate: true },
   { path: ROUTES.RESPONDENT, element: <Respondent />, isPrivate: true },
 
-  // Private Routes (Admin Only)
+  // Private Routes (Admin and HR)
   {
     path: ROUTES.BUILDER_NEW,
     element: <Builder />,
@@ -44,7 +46,19 @@ const routes: RouteConfig[] = [
     path: ROUTES.EMPLOYEES,
     element: <Employees />,
     isPrivate: true,
-    allowedRoles: ['ADMIN'],
+    allowedRoles: ['ADMIN', 'HR'], // HR should see the list too
+  },
+  {
+    path: ROUTES.EMPLOYEES_NEW,
+    element: <AddEmployee />,
+    isPrivate: true,
+    allowedRoles: ['ADMIN'], // Only Admin can create new users
+  },
+  {
+    path: ROUTES.DEPARTMENTS,
+    element: <DepartmentHub />,
+    isPrivate: true,
+    allowedRoles: ['ADMIN'], // Only Admin can manage departments
   },
 ];
 

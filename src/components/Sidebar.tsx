@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, FileText, Plus, ChevronRight, X, LogOut, Users } from 'lucide-react';
+import { LayoutDashboard, Plus, ChevronRight, X, LogOut, Users, Building2 } from 'lucide-react';
 import { ROUTES } from '../routes/config';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -14,9 +14,10 @@ function cn(...inputs: ClassValue[]) {
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
+  isCollapsed?: boolean;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
+const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, isCollapsed = false }) => {
   const { t } = useLocaleStore();
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
@@ -44,21 +45,22 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           name: t('sidebar.employees'),
           icon: Users,
           path: ROUTES.EMPLOYEES,
-          show: isAdmin, // Only Admin sees employees management
+          show: isAdmin || isHR,
         },
         {
-          name: t('sidebar.surveys'),
-          icon: FileText,
-          path: ROUTES.BUILDER_NEW,
-          show: canManageSurveys, // Admin and HR see survey management
+          name: t('sidebar.departments'),
+          icon: Building2,
+          path: ROUTES.DEPARTMENTS,
+          show: isAdmin,
         },
       ].filter((item) => item.show),
     },
   ];
 
   const sidebarClasses = cn(
-    'h-screen w-72 left-0 top-0 fixed bg-surface-container-low flex flex-col p-6 z-50 transition-transform duration-300 md:translate-x-0 ease-in-out border-r border-outline-variant/10',
-    isOpen ? 'translate-x-0' : '-translate-x-full'
+    'h-screen w-72 left-0 top-0 fixed bg-surface-container-low flex flex-col p-6 z-50 transition-transform duration-300 ease-in-out border-r border-outline-variant/10',
+    isOpen ? 'translate-x-0' : isCollapsed ? 'md:-translate-x-full' : 'md:translate-x-0',
+    !isOpen && 'max-md:-translate-x-full'
   );
 
   return (
@@ -76,9 +78,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           </div>
           <div>
             <h2 className="text-xl font-black text-blue-900 leading-none">PulsoRH</h2>
-            <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
-              HR Authority
-            </p>
           </div>
         </div>
 
@@ -134,7 +133,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
 
       {/* User Profile Area */}
       <div className="mt-auto pt-6 border-t border-outline-variant/10">
-        <div className="bg-surface-container/50 rounded-2xl p-4 flex items-center gap-3 mb-4">
+        <div className="bg-surface-container/50 rounded-2xl p-4 flex items-center gap-3 mb-4 border border-outline-variant/5">
           <div className="w-10 h-10 rounded-xl overflow-hidden border border-white shadow-sm flex-shrink-0">
             <img
               src={
@@ -147,7 +146,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           </div>
           <div className="overflow-hidden">
             <h4 className="text-sm font-bold text-on-surface truncate">{user?.name}</h4>
-            <p className="text-[10px] text-slate-500 font-medium truncate">{user?.email}</p>
+            <div className="flex items-center gap-1">
+              <span className="text-[8px] font-black uppercase tracking-tighter bg-primary/10 text-primary px-1.5 py-0.5 rounded border border-primary/10">
+                {user?.role}
+              </span>
+              <p className="text-[10px] text-slate-400 font-medium truncate">{user?.email}</p>
+            </div>
           </div>
         </div>
 

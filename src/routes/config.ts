@@ -5,5 +5,7 @@ export const ROUTES = {
   BUILDER_EDIT: '/builder/:id',
   RESPONDENT: '/responder/:id',
   EMPLOYEES: '/employees',
+  EMPLOYEES_NEW: '/employees/new',
+  DEPARTMENTS: '/departments',
   ROOT: '/',
 };

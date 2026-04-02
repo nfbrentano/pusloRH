@@ -38,12 +38,25 @@ export type TranslationKey = string;
 
 export type UserRole = 'ADMIN' | 'USER' | 'HR';
 
+export interface Department {
+  id: string;
+  name: string;
+  color: string;
+  _count?: {
+    users: number;
+  };
+}
+
 export interface User {
   id: string;
   name: string;
   email: string;
   role: UserRole;
   avatar?: string;
+  status: string;
+  departmentId?: string;
+  department?: Department;
+  createdAt: string;
 }
 
 export type SurveyInput = Omit<Survey, 'id' | 'createdAt'> & {

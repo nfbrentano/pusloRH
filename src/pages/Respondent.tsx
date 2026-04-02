@@ -365,6 +365,8 @@ const Respondent: React.FC = () => {
                 {q.allowComment && (
                   <div className="relative mt-4">
                     <textarea
+                      id={`comment-${q.id}`}
+                      name={`comment-${q.id}`}
                       className="w-full bg-surface-container-low border-0 rounded-xl p-6 font-body text-on-surface focus:ring-2 focus:ring-primary-container transition-all resize-none placeholder:text-slate-400"
                       placeholder={t('respondent.comment_placeholder')}
                       rows={3}
