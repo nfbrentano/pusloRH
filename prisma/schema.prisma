@@ -1,0 +1,51 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String
+  role      String   // 'ADMIN' or 'USER'
+  avatar    String?
+  createdAt DateTime @default(now())
+}
+
+model Survey {
+  id                String     @id @default(uuid())
+  title             String
+  description       String
+  openDate          String
+  closeDate         String
+  expectedResponses Int        @default(0)
+  isActive          Boolean    @default(true)
+  createdAt         DateTime   @default(now())
+  questions         Question[]
+  responses         Response[]
+}
+
+model Question {
+  id           String   @id @default(uuid())
+  surveyId     String
+  survey       Survey   @relation(fields: [surveyId], references: [id])
+  text         String
+  type         String
+  allowComment Boolean  @default(false)
+  responses    Response[]
+}
+
+model Response {
+  id         String   @id @default(uuid())
+  surveyId   String
+  survey     Survey   @relation(fields: [surveyId], references: [id])
+  questionId String
+  question   Question @relation(fields: [questionId], references: [id])
+  value      String   // Using String to handle all types (Binary, Likert, NPS)
+  comment    String?
+  createdAt  DateTime @default(now())
+}

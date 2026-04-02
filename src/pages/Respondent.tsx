@@ -1,35 +1,62 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useSurveyStore } from '../store/useSurveyStore';
-import { ShieldCheck, HelpCircle, Bell, Send, CheckCircle2, Lock } from 'lucide-react';
+import { useSurvey, useSubmitResponse } from '../hooks/useSurveys';
+import type { Question, Survey } from '../types';
+import {
+  ShieldCheck,
+  HelpCircle,
+  Bell,
+  Send,
+  CheckCircle2,
+  Lock,
+  Loader2,
+  AlertCircle,
+} from 'lucide-react';
 import { isWithinInterval, parseISO, startOfDay, endOfDay } from 'date-fns';
 import { useLocaleStore } from '../store/useLocaleStore';
 
 const Respondent: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { surveys, questions, addResponse } = useSurveyStore();
+  const { data: survey, isLoading, isError } = useSurvey(id || null);
+  const submitMutation = useSubmitResponse();
   const { t } = useLocaleStore();
-  
-  const survey = surveys.find(s => s.id === id);
-  const surveyQuestions = questions.filter(q => q.surveyId === id);
-  
-  const [answers, setAnswers] = useState<Record<string, { value: any, comment?: string }>>({});
+
+  const [answers, setAnswers] = useState<
+    Record<string, { value: string | number; comment?: string }>
+  >({});
   const [submitted, setSubmitted] = useState(false);
 
-  if (!survey) {
-    return <div className="p-20 text-center font-headline text-2xl">{t('respondent.not_found')}</div>;
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-surface space-y-4">
+        <Loader2 className="w-12 h-12 text-primary animate-spin" />
+        <p className="font-bold text-on-surface-variant">Abrindo formulário de pesquisa...</p>
+      </div>
+    );
+  }
+
+  if (isError || !survey) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-surface text-center p-8 space-y-6">
+        <AlertCircle className="w-16 h-16 text-error" />
+        <h2 className="text-3xl font-bold text-on-surface">{t('respondent.not_found')}</h2>
+        <p className="text-on-surface-variant max-w-md">
+          Não conseguimos encontrar esta pesquisa em nossa base de dados.
+        </p>
+      </div>
+    );
   }
 
   // Date Validation
   const today = startOfDay(new Date());
-  const open = parseISO(survey.openDate);
-  const close = endOfDay(parseISO(survey.closeDate));
-  
+  const open = parseISO((survey as Survey).openDate);
+  const close = endOfDay(parseISO((survey as Survey).closeDate));
+
   const isActiveDate = isWithinInterval(today, { start: open, end: close });
-  const isActuallyActive = survey.isActive !== false && isActiveDate;
+  const isActuallyActive = (survey as Survey).isActive !== false && isActiveDate;
 
   if (!isActuallyActive) {
-    const isInactive = survey.isActive === false;
+    const isInactive = (survey as Survey).isActive === false;
     return (
       <div className="min-h-screen flex items-center justify-center bg-surface p-6">
         <div className="bg-surface-container-lowest p-12 rounded-[2.5rem] shadow-xl max-w-lg text-center space-y-6">
@@ -40,11 +67,14 @@ const Respondent: React.FC = () => {
             {isInactive ? t('respondent.inactive_title') : t('respondent.out_of_date')}
           </h2>
           <p className="text-on-surface-variant text-lg">
-            {isInactive ? t('respondent.inactive_description') : t('respondent.out_of_date_description')}
+            {isInactive
+              ? t('respondent.inactive_description')
+              : t('respondent.out_of_date_description')}
           </p>
           {!isInactive && (
             <p className="text-sm text-slate-400">
-              {t('respondent.period')}: {survey.openDate} {t('respondent.survey_to_date') || 'até'} {survey.closeDate}
+              {t('respondent.period')}: {(survey as Survey).openDate}{' '}
+              {t('respondent.survey_to_date') || 'até'} {(survey as Survey).closeDate}
             </p>
           )}
         </div>
@@ -59,11 +89,11 @@ const Respondent: React.FC = () => {
           <div className="w-20 h-20 bg-secondary-container text-secondary rounded-full flex items-center justify-center mx-auto">
             <CheckCircle2 className="w-10 h-10" />
           </div>
-          <h2 className="text-3xl font-extrabold font-headline text-on-surface">{t('respondent.success_title')}</h2>
-          <p className="text-on-surface-variant text-lg">
-            {t('respondent.success_message')}
-          </p>
-          <button 
+          <h2 className="text-3xl font-extrabold font-headline text-on-surface">
+            {t('respondent.success_title')}
+          </h2>
+          <p className="text-on-surface-variant text-lg">{t('respondent.success_message')}</p>
+          <button
             onClick={() => window.location.reload()}
             className="text-primary font-bold hover:underline"
           >
@@ -74,52 +104,75 @@ const Respondent: React.FC = () => {
     );
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    Object.entries(answers).forEach(([qId, data]) => {
-      addResponse({
+
+    const formattedResponses = Object.entries(answers).map(([qId, data]) => ({
+      questionId: qId,
+      value: data.value,
+      comment: data.comment,
+    }));
+
+    try {
+      await submitMutation.mutateAsync({
         surveyId: id!,
-        questionId: qId,
-        value: data.value,
-        comment: data.comment
+        responses: formattedResponses,
       });
-    });
-    setSubmitted(true);
+      setSubmitted(true);
+    } catch {
+      alert('Erro ao enviar respostas.');
+    }
   };
 
-  const handleValueChange = (qId: string, value: any) => {
-    setAnswers(prev => ({
+  const handleValueChange = (qId: string, value: string | number) => {
+    setAnswers((prev) => ({
       ...prev,
-      [qId]: { ...prev[qId], value }
+      [qId]: { ...prev[qId], value },
     }));
   };
 
   const handleCommentChange = (qId: string, comment: string) => {
-    setAnswers(prev => ({
+    setAnswers((prev) => ({
       ...prev,
-      [qId]: { ...prev[qId], comment }
+      [qId]: { ...prev[qId], comment },
     }));
   };
 
-  const renderQuestionInput = (q: any) => {
+  const renderQuestionInput = (q: Question) => {
     switch (q.type) {
       case 'Binary':
         return (
           <div className="flex justify-center gap-4 md:gap-8 pt-4">
             {[
-              { emoji: '👍', label: t('builder.label_yes'), val: 'Yes', color: 'hover:bg-success/5 hover:text-success peer-checked:bg-success peer-checked:text-white border-success/20' },
-              { emoji: '👎', label: t('builder.label_no'), val: 'No', color: 'hover:bg-error/5 hover:text-error peer-checked:bg-error peer-checked:text-white border-error/20' },
+              {
+                emoji: '👍',
+                label: t('builder.label_yes'),
+                val: 'Yes',
+                color:
+                  'hover:bg-success/5 hover:text-success peer-checked:bg-success peer-checked:text-white border-success/20',
+              },
+              {
+                emoji: '👎',
+                label: t('builder.label_no'),
+                val: 'No',
+                color:
+                  'hover:bg-error/5 hover:text-error peer-checked:bg-error peer-checked:text-white border-error/20',
+              },
             ].map((item) => (
               <label key={item.val} className="flex-1 max-w-[160px] cursor-pointer group/binary">
-                <input 
-                  type="radio" 
+                <input
+                  type="radio"
                   name={`q-${q.id}`}
                   className="sr-only peer"
                   onChange={() => handleValueChange(q.id, item.val)}
                   checked={answers[q.id]?.value === item.val}
                 />
-                <div className={`flex flex-col items-center gap-3 p-6 rounded-2xl border-2 transition-all duration-200 ${item.color}`}>
-                  <span className="text-4xl group-hover/binary:scale-110 transition-transform">{item.emoji}</span>
+                <div
+                  className={`flex flex-col items-center gap-3 p-6 rounded-2xl border-2 transition-all duration-200 ${item.color}`}
+                >
+                  <span className="text-4xl group-hover/binary:scale-110 transition-transform">
+                    {item.emoji}
+                  </span>
                   <span className="font-bold text-sm uppercase tracking-wider">{item.label}</span>
                 </div>
               </label>
@@ -137,9 +190,12 @@ const Respondent: React.FC = () => {
               { emoji: '🙂', label: t('builder.likert_agree_4'), val: 4 },
               { emoji: '🤩', label: t('builder.likert_agree_5'), val: 5 },
             ].map((item) => (
-              <label key={item.val} className="flex flex-col items-center gap-3 cursor-pointer group/likert">
-                <input 
-                  type="radio" 
+              <label
+                key={item.val}
+                className="flex flex-col items-center gap-3 cursor-pointer group/likert"
+              >
+                <input
+                  type="radio"
                   name={`q-${q.id}`}
                   className="sr-only peer"
                   onChange={() => handleValueChange(q.id, item.val)}
@@ -166,9 +222,12 @@ const Respondent: React.FC = () => {
               { emoji: '🌖', label: t('builder.likert_freq_4'), val: 4 },
               { emoji: '🌕', label: t('builder.likert_freq_5'), val: 5 },
             ].map((item) => (
-              <label key={item.val} className="flex flex-col items-center gap-3 cursor-pointer group/likert">
-                <input 
-                  type="radio" 
+              <label
+                key={item.val}
+                className="flex flex-col items-center gap-3 cursor-pointer group/likert"
+              >
+                <input
+                  type="radio"
                   name={`q-${q.id}`}
                   className="sr-only peer"
                   onChange={() => handleValueChange(q.id, item.val)}
@@ -195,9 +254,12 @@ const Respondent: React.FC = () => {
               { emoji: '🙂', label: t('respondent.rating_4'), val: 4 },
               { emoji: '🤩', label: t('respondent.rating_5'), val: 5 },
             ].map((item) => (
-              <label key={item.val} className="flex flex-col items-center gap-3 cursor-pointer group/emoji">
-                <input 
-                  type="radio" 
+              <label
+                key={item.val}
+                className="flex flex-col items-center gap-3 cursor-pointer group/emoji"
+              >
+                <input
+                  type="radio"
                   name={`q-${q.id}`}
                   className="sr-only peer"
                   onChange={() => handleValueChange(q.id, item.val)}
@@ -218,22 +280,26 @@ const Respondent: React.FC = () => {
       default:
         return (
           <div className="pt-10 px-4">
-            <input 
-              type="range" 
-              min="1" 
-              max="10" 
+            <input
+              type="range"
+              min="1"
+              max="10"
               className="w-full h-2 bg-secondary-container rounded-lg appearance-none cursor-pointer accent-secondary"
-              value={answers[q.id]?.value || 5}
+              value={(answers[q.id]?.value as number) || 5}
               onChange={(e) => handleValueChange(q.id, parseInt(e.target.value))}
             />
             <div className="flex justify-between mt-6 px-1">
               <div className="flex flex-col gap-1">
                 <span className="text-sm font-bold text-on-surface">1</span>
-                <span className="text-[10px] uppercase tracking-tighter text-slate-500 font-semibold">{t('respondent.slider_min')}</span>
+                <span className="text-[10px] uppercase tracking-tighter text-slate-500 font-semibold">
+                  {t('respondent.slider_min')}
+                </span>
               </div>
               <div className="flex flex-col items-end gap-1">
                 <span className="text-sm font-bold text-on-surface">10</span>
-                <span className="text-[10px] uppercase tracking-tighter text-slate-500 font-semibold">{t('respondent.slider_max')}</span>
+                <span className="text-[10px] uppercase tracking-tighter text-slate-500 font-semibold">
+                  {t('respondent.slider_max')}
+                </span>
               </div>
             </div>
           </div>
@@ -245,7 +311,9 @@ const Respondent: React.FC = () => {
     <div className="bg-surface font-body text-on-surface antialiased">
       <header className="bg-surface/80 backdrop-blur-md sticky top-0 z-50 flex justify-between items-center px-8 h-16 w-full shadow-sm">
         <div className="flex items-center gap-3">
-          <span className="text-2xl font-bold tracking-tighter text-blue-800 font-headline">PulsoRH</span>
+          <span className="text-2xl font-bold tracking-tighter text-blue-800 font-headline">
+            PulsoRH
+          </span>
         </div>
         <div className="flex items-center gap-6">
           <div className="hidden md:flex items-center gap-1 text-slate-500 font-medium text-sm">
@@ -262,7 +330,9 @@ const Respondent: React.FC = () => {
       <main className="max-w-4xl mx-auto px-6 py-12 md:py-20">
         <section className="mb-16">
           <div className="flex flex-col gap-4">
-            <span className="text-secondary font-headline font-bold uppercase tracking-widest text-xs">{t('respondent.internal_survey')}</span>
+            <span className="text-secondary font-headline font-bold uppercase tracking-widest text-xs">
+              {t('respondent.internal_survey')}
+            </span>
             <h1 className="font-headline font-extrabold text-4xl md:text-5xl lg:text-6xl text-on-surface leading-tight tracking-tight">
               {survey.title}
             </h1>
@@ -275,12 +345,15 @@ const Respondent: React.FC = () => {
         </section>
 
         <form onSubmit={handleSubmit} className="space-y-8">
-          {surveyQuestions.map((q, index) => (
-            <div key={q.id} className="bg-surface-container-lowest rounded-xl p-8 md:p-12 transition-all duration-300 hover:shadow-lg group">
+          {(survey.questions || []).map((q: Question, index: number) => (
+            <div
+              key={q.id}
+              className="bg-surface-container-lowest rounded-xl p-8 md:p-12 transition-all duration-300 hover:shadow-lg group"
+            >
               <div className="flex flex-col gap-8">
                 <div className="flex items-start gap-4">
                   <span className="bg-primary-fixed text-primary px-3 py-1 rounded-lg font-bold font-headline text-sm">
-                    {String(index+1).padStart(2, '0')}
+                    {String(index + 1).padStart(2, '0')}
                   </span>
                   <h2 className="font-headline font-bold text-2xl text-on-surface leading-snug">
                     {q.text}
@@ -291,8 +364,8 @@ const Respondent: React.FC = () => {
 
                 {q.allowComment && (
                   <div className="relative mt-4">
-                    <textarea 
-                      className="w-full bg-surface-container-low border-0 rounded-xl p-6 font-body text-on-surface focus:ring-2 focus:ring-primary-container transition-all resize-none placeholder:text-slate-400" 
+                    <textarea
+                      className="w-full bg-surface-container-low border-0 rounded-xl p-6 font-body text-on-surface focus:ring-2 focus:ring-primary-container transition-all resize-none placeholder:text-slate-400"
                       placeholder={t('respondent.comment_placeholder')}
                       rows={3}
                       value={answers[q.id]?.comment || ''}
@@ -306,12 +379,19 @@ const Respondent: React.FC = () => {
 
           <div className="pt-12 pb-24 flex flex-col items-center gap-8">
             <div className="w-full h-px bg-surface-container-high max-w-xs"></div>
-            <button 
+            <button
               onClick={handleSubmit}
-              className="bg-signature-gradient group flex items-center justify-center gap-4 py-6 px-12 rounded-xl shadow-xl hover:shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all duration-200"
+              disabled={submitMutation.isPending}
+              className="bg-signature-gradient group flex items-center justify-center gap-4 py-6 px-12 rounded-xl shadow-xl hover:shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all duration-200 disabled:opacity-50"
             >
-              <span className="font-headline font-extrabold text-xl text-white tracking-tight">{t('respondent.send_responses')}</span>
-              <Send className="text-white w-6 h-6 transition-transform group-hover:translate-x-1" />
+              <span className="font-headline font-extrabold text-xl text-white tracking-tight">
+                {submitMutation.isPending ? 'Enviando...' : t('respondent.send_responses')}
+              </span>
+              {submitMutation.isPending ? (
+                <Loader2 className="text-white w-6 h-6 animate-spin" />
+              ) : (
+                <Send className="text-white w-6 h-6 transition-transform group-hover:translate-x-1" />
+              )}
             </button>
             <p className="text-slate-400 text-sm flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-secondary" />

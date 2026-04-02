@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { translations } from '../i18n/translations';
-import type { Locale } from '../i18n/translations';
+import type { Locale } from '../types';
 
 interface LocaleState {
   locale: Locale;
@@ -17,11 +17,15 @@ export const useLocaleStore = create<LocaleState>()(
       t: (key, replacements) => {
         const locale = get().locale;
         const keys = key.split('.');
-        let translation: any = translations[locale];
+        let translation: unknown = translations[locale];
 
         for (const k of keys) {
-          if (translation && translation[k] !== undefined) {
-            translation = translation[k];
+          if (
+            translation &&
+            typeof translation === 'object' &&
+            k in (translation as Record<string, unknown>)
+          ) {
+            translation = (translation as Record<string, unknown>)[k];
           } else {
             // Fallback for missing key
             return key;

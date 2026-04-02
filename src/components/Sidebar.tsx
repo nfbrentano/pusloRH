@@ -1,15 +1,10 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
-import {
-  LayoutDashboard,
-  FileText,
-  Plus,
-  ChevronRight,
-  X
-} from 'lucide-react';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { LayoutDashboard, FileText, Plus, ChevronRight, X, LogOut } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { useLocaleStore } from '../store/useLocaleStore';
+import { useAuthStore } from '../store/useAuthStore';
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -22,20 +17,39 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const { t } = useLocaleStore();
+  const { user, logout } = useAuthStore();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
+  const isAdmin = user?.role === 'ADMIN';
 
   const sections = [
     {
       title: t('sidebar.platform'),
       items: [
-        { name: t('sidebar.dashboard'), icon: LayoutDashboard, path: '/dashboard' },
-        { name: t('sidebar.surveys'), icon: FileText, path: '/builder' },
-      ]
-    }
+        {
+          name: t('sidebar.dashboard'),
+          icon: LayoutDashboard,
+          path: '/dashboard',
+          show: true, // Everyone can see dashboard (though content may vary)
+        },
+        {
+          name: t('sidebar.surveys'),
+          icon: FileText,
+          path: '/builder',
+          show: isAdmin, // Only Admin sees survey management
+        },
+      ].filter((item) => item.show),
+    },
   ];
 
   const sidebarClasses = cn(
-    "h-screen w-72 left-0 top-0 fixed bg-surface-container-low flex flex-col p-6 z-50 transition-transform duration-300 md:translate-x-0 ease-in-out border-r border-outline-variant/10",
-    isOpen ? "translate-x-0" : "-translate-x-full"
+    'h-screen w-72 left-0 top-0 fixed bg-surface-container-low flex flex-col p-6 z-50 transition-transform duration-300 md:translate-x-0 ease-in-out border-r border-outline-variant/10',
+    isOpen ? 'translate-x-0' : '-translate-x-full'
   );
 
   return (
@@ -44,11 +58,18 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       <div className="mb-10 flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
-            <span className="material-symbols-outlined text-white text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>pulse_alert</span>
+            <span
+              className="material-symbols-outlined text-white text-2xl"
+              style={{ fontVariationSettings: "'FILL' 1" }}
+            >
+              pulse_alert
+            </span>
           </div>
           <div>
             <h2 className="text-xl font-black text-blue-900 leading-none">PulsoRH</h2>
-            <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">HR Authority</p>
+            <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
+              HR Authority
+            </p>
           </div>
         </div>
 
@@ -58,16 +79,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         >
           <X className="w-6 h-6" />
         </button>
-      </div>
-
-      {/* Search Field (Sidebar Version) */}
-      <div className="mb-8 relative lg:hidden">
-        <input
-          className="w-full bg-surface-container border-none rounded-xl pl-10 pr-4 py-2.5 text-sm"
-          placeholder={t('common.search')}
-          type="text"
-        />
-        <ChevronRight className="absolute left-3 top-3 text-slate-400 w-4 h-4" />
       </div>
 
       <nav className="flex-1 space-y-8 overflow-y-auto pr-2 custom-scrollbar">
@@ -81,17 +92,26 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                 <NavLink
                   key={item.name}
                   to={item.path}
-                  onClick={() => { if (window.innerWidth < 768) onClose(); }}
-                  className={({ isActive }) => cn(
-                    "flex items-center group space-x-3 px-4 py-3 transition-all duration-200 rounded-2xl",
-                    isActive
-                      ? "bg-primary text-white shadow-md shadow-primary/20 font-bold"
-                      : "text-slate-500 hover:bg-surface-container-high/50 hover:text-primary"
-                  )}
+                  onClick={() => {
+                    if (window.innerWidth < 768) onClose();
+                  }}
+                  className={({ isActive }) =>
+                    cn(
+                      'flex items-center group space-x-3 px-4 py-3 transition-all duration-200 rounded-2xl',
+                      isActive
+                        ? 'bg-primary text-white shadow-md shadow-primary/20 font-bold'
+                        : 'text-slate-500 hover:bg-surface-container-high/50 hover:text-primary'
+                    )
+                  }
                 >
                   {({ isActive }) => (
                     <>
-                      <item.icon className={cn("w-5 h-5", isActive ? "text-white" : "text-slate-400 group-hover:text-primary")} />
+                      <item.icon
+                        className={cn(
+                          'w-5 h-5',
+                          isActive ? 'text-white' : 'text-slate-400 group-hover:text-primary'
+                        )}
+                      />
                       <span className="font-headline font-semibold text-sm">{item.name}</span>
                       {isActive && <ChevronRight className="w-4 h-4 ml-auto" />}
                     </>
@@ -105,28 +125,42 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
 
       {/* User Profile Area */}
       <div className="mt-auto pt-6 border-t border-outline-variant/10">
-        <div className="bg-surface-container/50 rounded-2xl p-4 flex items-center gap-3 mb-6">
+        <div className="bg-surface-container/50 rounded-2xl p-4 flex items-center gap-3 mb-4">
           <div className="w-10 h-10 rounded-xl overflow-hidden border border-white shadow-sm flex-shrink-0">
             <img
-              src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1287&auto=format&fit=crop"
+              src={
+                user?.avatar ||
+                'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1287&auto=format&fit=crop'
+              }
               className="w-full h-full object-cover"
               alt="Profile"
             />
           </div>
           <div className="overflow-hidden">
-            <h4 className="text-sm font-bold text-on-surface truncate">{t('sidebar.admin')}</h4>
-            <p className="text-[10px] text-slate-500 font-medium truncate">admin@pulsorh.com</p>
+            <h4 className="text-sm font-bold text-on-surface truncate">{user?.name}</h4>
+            <p className="text-[10px] text-slate-500 font-medium truncate">{user?.email}</p>
           </div>
         </div>
 
-        <NavLink
-          to="/builder"
-          onClick={() => { if (window.innerWidth < 768) onClose(); }}
-          className="w-full flex items-center justify-center space-x-2 bg-signature-gradient text-on-primary py-4 px-4 rounded-2xl font-bold shadow-lg shadow-primary/25 hover:opacity-90 transition-all active:scale-[0.98]"
-        >
-          <Plus className="w-5 h-5" />
-          <span className="text-sm">{t('sidebar.new_survey')}</span>
-        </NavLink>
+        <div className="flex flex-col gap-2">
+          {isAdmin && (
+            <NavLink
+              to="/builder"
+              className="w-full flex items-center justify-center space-x-2 bg-signature-gradient text-on-primary py-3 px-4 rounded-2xl font-bold shadow-lg shadow-primary/25 hover:opacity-90 transition-all active:scale-[0.98]"
+            >
+              <Plus className="w-5 h-5" />
+              <span className="text-sm">{t('sidebar.new_survey')}</span>
+            </NavLink>
+          )}
+
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center justify-center space-x-2 bg-slate-100 text-slate-600 py-3 px-4 rounded-2xl font-bold hover:bg-slate-200 transition-all active:scale-[0.98]"
+          >
+            <LogOut className="w-5 h-5" />
+            <span className="text-sm">{t('common.logout')}</span>
+          </button>
+        </div>
       </div>
     </aside>
   );

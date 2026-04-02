@@ -16,20 +16,18 @@ const Layout: React.FC<LayoutProps> = ({ children, title }) => {
   return (
     <div className="bg-surface text-on-surface min-h-screen relative">
       <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
-      
+
       {/* Overlay for mobile */}
       {isSidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-on-background/20 backdrop-blur-sm z-30 md:hidden transition-opacity duration-300"
           onClick={closeSidebar}
         />
       )}
 
       <Header title={title} onMenuClick={toggleSidebar} />
-      
-      <main className="pt-24 pb-20 md:pb-8 md:pl-72 lg:pr-8 min-h-screen">
-        {children}
-      </main>
+
+      <main className="pt-24 pb-20 md:pb-8 md:pl-72 lg:pr-8 min-h-screen">{children}</main>
     </div>
   );
 };

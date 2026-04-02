@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
   --color-on-tertiary-container: #8bf088;
@@ -49,9 +49,9 @@
   --color-surface-tint: #005db6;
   --color-primary-container: #005eb8;
 
-  --font-headline: "Manrope", sans-serif;
-  --font-body: "Inter", sans-serif;
-  --font-label: "Inter", sans-serif;
+  --font-headline: 'Manrope', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-label: 'Inter', sans-serif;
 
   --radius-DEFAULT: 0.25rem;
   --radius-lg: 0.5rem;
@@ -83,12 +83,20 @@
     @apply m-0 min-h-screen bg-surface text-on-surface antialiased;
   }
 
-  h1, h2, h3, h4, .font-headline {
+  h1,
+  h2,
+  h3,
+  h4,
+  .font-headline {
     @apply font-headline;
   }
 
   .material-symbols-outlined {
-    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    font-variation-settings:
+      'FILL' 0,
+      'wght' 400,
+      'GRAD' 0,
+      'opsz' 24;
   }
 }
 

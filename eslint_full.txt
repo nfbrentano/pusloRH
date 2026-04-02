@@ -1,0 +1,28 @@
+
+/Users/natanaelbrentano/PulsoRH/server/index.ts
+   54:12  error  '_error' is defined but never used  @typescript-eslint/no-unused-vars
+   69:12  error  '_error' is defined but never used  @typescript-eslint/no-unused-vars
+  132:12  error  '_error' is defined but never used  @typescript-eslint/no-unused-vars
+  155:12  error  '_error' is defined but never used  @typescript-eslint/no-unused-vars
+  168:12  error  '_error' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/natanaelbrentano/PulsoRH/src/pages/Builder.tsx
+  53:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/natanaelbrentano/PulsoRH/src/pages/Builder.tsx:53:7
+  51 |     // Only initialize once when data arrives or when ID changes (new survey)
+  52 |     if (id && existingSurvey && !hasInitialized.current) {
+> 53 |       setTitle(existingSurvey.title);
+     |       ^^^^^^^^ Avoid calling setState() directly within an effect
+  54 |       setDescription(existingSurvey.description);
+  55 |       setOpenDate(existingSurvey.openDate);
+  56 |       setCloseDate(existingSurvey.closeDate);  react-hooks/set-state-in-effect
+
+✖ 6 problems (6 errors, 0 warnings)
+

@@ -15,6 +15,7 @@ export const translations = {
       search: 'Pesquisar...',
       not_found: 'Não encontrado',
       error: 'Erro',
+      logout: 'Sair',
     },
     sidebar: {
       platform: 'PLATAFORMA',
@@ -39,7 +40,8 @@ export const translations = {
       last_response: 'Última resposta',
       status_open: 'Em Aberto',
       launch_title: 'Lançar um Pulso',
-      launch_description: 'Crie uma pesquisa rápida de 5 perguntas para checar o humor do seu time.',
+      launch_description:
+        'Crie uma pesquisa rápida de 5 perguntas para checar o humor do seu time.',
       status_inactive: 'Inativa',
       get_started: 'Começar',
     },
@@ -67,15 +69,20 @@ export const translations = {
       inactivate_survey: 'Inativar Pesquisa',
       activate_survey: 'Reativar Pesquisa',
       type_emoticons: 'Sentimento',
-      type_emoticons_tooltip: 'Ideal para capturar o estado emocional e o nível de satisfação imediata do colaborador.',
+      type_emoticons_tooltip:
+        'Ideal para capturar o estado emocional e o nível de satisfação imediata do colaborador.',
       type_slider: 'Escala Numérica',
-      type_slider_tooltip: 'Melhor para medir intensidade, probabilidade (NPS) ou quando se deseja uma resposta em um intervalo graduado.',
+      type_slider_tooltip:
+        'Melhor para medir intensidade, probabilidade (NPS) ou quando se deseja uma resposta em um intervalo graduado.',
       type_binary: 'Dicotômica',
-      type_binary_tooltip: 'Melhor para mapear fatos objetivos e checar a aplicação de processos ou políticas claras da empresa.',
+      type_binary_tooltip:
+        'Melhor para mapear fatos objetivos e checar a aplicação de processos ou políticas claras da empresa.',
       type_likert_agreement: 'Concordância',
-      type_likert_agreement_tooltip: 'Melhor para avaliar percepções subjetivas de clima, como cultura, relação com a liderança e ambiente de trabalho.',
+      type_likert_agreement_tooltip:
+        'Melhor para avaliar percepções subjetivas de clima, como cultura, relação com a liderança e ambiente de trabalho.',
       type_likert_frequency: 'Frequência',
-      type_likert_frequency_tooltip: 'Melhor para medir a recorrência de comportamentos, rotinas ou eventos no dia a dia do colaborador.',
+      type_likert_frequency_tooltip:
+        'Melhor para medir a recorrência de comportamentos, rotinas ou eventos no dia a dia do colaborador.',
       label_yes: 'Sim',
       label_no: 'Não',
       label_true: 'Verdadeiro',
@@ -92,22 +99,26 @@ export const translations = {
       likert_freq_5: 'Sempre',
     },
     respondent: {
-      anonymous: 'Esta pesquisa é anônima. Suas respostas serão tratadas com total confidencialidade.',
+      anonymous:
+        'Esta pesquisa é anônima. Suas respostas serão tratadas com total confidencialidade.',
       welcome: 'Seu feedback é fundamental para construirmos um ambiente melhor.',
       comment_placeholder: 'Escreva seu comentário aqui (opcional)...',
       success_title: 'Obrigado!',
-      success_message: 'Suas respostas foram registradas com sucesso. Seu feedback ajuda a construir uma empresa melhor.',
+      success_message:
+        'Suas respostas foram registradas com sucesso. Seu feedback ajuda a construir uma empresa melhor.',
       back_to_dashboard: 'Voltar ao Dashboard',
       preview_mode: 'MODO DE VISUALIZAÇÃO',
       preview_exit: 'Sair do Preview',
       preview_send_disabled: 'Botão de envio desativado no modo preview',
       not_found: 'Pesquisa não encontrada.',
       out_of_date: 'Fora do Prazo',
-      out_of_date_description: 'Esta pesquisa não está mais recebendo respostas ou ainda não foi iniciada.',
+      out_of_date_description:
+        'Esta pesquisa não está mais recebendo respostas ou ainda não foi iniciada.',
       period: 'Período',
       anonymous_response: 'Resposta Anônima',
       internal_survey: 'Pesquisa Interna',
-      default_description: 'Sua opinião é o pulso da nossa empresa. Este formulário é totalmente confidencial.',
+      default_description:
+        'Sua opinião é o pulso da nossa empresa. Este formulário é totalmente confidencial.',
       send_responses: 'Enviar Respostas',
       privacy_policy: 'Seus dados estão protegidos pela Política de Privacidade PulsoRH',
       send_another: 'Enviar outra resposta',
@@ -119,8 +130,22 @@ export const translations = {
       slider_min: 'Não concordo',
       slider_max: 'Concordo totalmente',
       inactive_title: 'Pesquisa Inativa',
-      inactive_description: 'Poxa, esta pesquisa já foi encerrada. Muito obrigado pelo seu interesse em participar!',
-    }
+      inactive_description:
+        'Poxa, esta pesquisa já foi encerrada. Muito obrigado pelo seu interesse em participar!',
+    },
+    auth: {
+      title: 'Bem-vindo ao PulsoRH',
+      subtitle: 'Acesse sua conta para gerenciar o clima organizacional',
+      email_label: 'E-mail',
+      email_placeholder: 'exemplo@empresa.com',
+      password_label: 'Senha',
+      password_placeholder: '••••••••',
+      login_button: 'Entrar na Plataforma',
+      select_role: 'Selecione seu perfil de acesso',
+      admin_role: 'Administrador (Gestão e Dashboard)',
+      user_role: 'Colaborador (Apenas responder)',
+      error_message: 'Credenciais inválidas. Tente novamente.',
+    },
   },
   en: {
     common: {
@@ -188,15 +213,20 @@ export const translations = {
       inactivate_survey: 'Inactivate Survey',
       activate_survey: 'Reactivate Survey',
       type_emoticons: 'Sentiment',
-      type_emoticons_tooltip: 'Ideal for capturing the collaborator\'s emotional state and immediate satisfaction level.',
+      type_emoticons_tooltip:
+        "Ideal for capturing the collaborator's emotional state and immediate satisfaction level.",
       type_slider: 'Numeric Scale',
-      type_slider_tooltip: 'Best for measuring intensity, probability (NPS), or when a response in a graduated range is desired.',
+      type_slider_tooltip:
+        'Best for measuring intensity, probability (NPS), or when a response in a graduated range is desired.',
       type_binary: 'Binary',
-      type_binary_tooltip: 'Best for mapping objective facts and checking the application of clear company processes or policies.',
+      type_binary_tooltip:
+        'Best for mapping objective facts and checking the application of clear company processes or policies.',
       type_likert_agreement: 'Agreement',
-      type_likert_agreement_tooltip: 'Best for evaluating subjective perceptions of climate, such as culture, relationship with leadership and work environment.',
+      type_likert_agreement_tooltip:
+        'Best for evaluating subjective perceptions of climate, such as culture, relationship with leadership and work environment.',
       type_likert_frequency: 'Frequency',
-      type_likert_frequency_tooltip: 'Best for measuring the recurrence of behaviors, routines or events in the employee\'s daily life.',
+      type_likert_frequency_tooltip:
+        "Best for measuring the recurrence of behaviors, routines or events in the employee's daily life.",
       label_yes: 'Yes',
       label_no: 'No',
       label_true: 'True',
@@ -213,22 +243,26 @@ export const translations = {
       likert_freq_5: 'Always',
     },
     respondent: {
-      anonymous: 'This survey is anonymous. Your responses will be treated with full confidentiality.',
+      anonymous:
+        'This survey is anonymous. Your responses will be treated with full confidentiality.',
       welcome: 'Your feedback is fundamental to building a better environment.',
       comment_placeholder: 'Write your comment here (optional)...',
       success_title: 'Thank you!',
-      success_message: 'Your responses have been recorded successfully. Your feedback helps build a better company.',
+      success_message:
+        'Your responses have been recorded successfully. Your feedback helps build a better company.',
       back_to_dashboard: 'Back to Dashboard',
       preview_mode: 'VIEW MODE',
       preview_exit: 'Exit Preview',
       preview_send_disabled: 'Send button disabled in preview mode',
       not_found: 'Survey not found.',
       out_of_date: 'Out of Time',
-      out_of_date_description: 'This survey is no longer receiving responses or has not yet started.',
+      out_of_date_description:
+        'This survey is no longer receiving responses or has not yet started.',
       period: 'Period',
       anonymous_response: 'Anonymous Response',
       internal_survey: 'Internal Survey',
-      default_description: 'Your opinion is the pulse of our company. This form is completely confidential.',
+      default_description:
+        'Your opinion is the pulse of our company. This form is completely confidential.',
       send_responses: 'Send Responses',
       privacy_policy: 'Your data is protected by the PulsoRH Privacy Policy',
       send_another: 'Send another response',
@@ -240,10 +274,21 @@ export const translations = {
       slider_min: 'Strongly disagree',
       slider_max: 'Strongly agree',
       inactive_title: 'Survey Inactive',
-      inactive_description: 'Oh no, this survey has already closed. Thank you so much for your interest in participating!',
-    }
-  }
+      inactive_description:
+        'Oh no, this survey has already closed. Thank you so much for your interest in participating!',
+    },
+    auth: {
+      title: 'Welcome to PulsoRH',
+      subtitle: 'Access your account to manage organizational climate',
+      email_label: 'Email',
+      email_placeholder: 'example@company.com',
+      password_label: 'Password',
+      password_placeholder: '••••••••',
+      login_button: 'Sign in to Platform',
+      select_role: 'Select your access profile',
+      admin_role: 'Administrator (Management & Dashboard)',
+      user_role: 'Employee (Respond only)',
+      error_message: 'Invalid credentials. Please try again.',
+    },
+  },
 };
-
-export type Locale = 'pt' | 'en';
-export type TranslationKey = string;
