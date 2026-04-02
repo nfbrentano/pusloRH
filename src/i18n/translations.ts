@@ -95,7 +95,7 @@ export const translations = {
       slider_min: 'Não concordo',
       slider_max: 'Concordo totalmente',
       inactive_title: 'Pesquisa Inativa',
-      inactive_description: 'Esta pesquisa foi desativada pelo administrador e não está mais recebendo respostas.',
+      inactive_description: 'Poxa, esta pesquisa já foi encerrada. Muito obrigado pelo seu interesse em participar!',
     }
   },
   en: {
@@ -192,7 +192,7 @@ export const translations = {
       slider_min: 'Strongly disagree',
       slider_max: 'Strongly agree',
       inactive_title: 'Survey Inactive',
-      inactive_description: 'This survey has been deactivated by the administrator and is no longer receiving responses.',
+      inactive_description: 'Oh no, this survey has already closed. Thank you so much for your interest in participating!',
     }
   }
 };
