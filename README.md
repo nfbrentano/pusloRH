@@ -1,69 +1,88 @@
-# PulsoRH - SaaS de Clima Organizacional
+# PulsoRH - SaaS de Gestão de Talentos e Clima Organizacional
 
-PulsoRH é uma plataforma moderna de **SaaS (Software as a Service)** focada em medir o pulso da cultura organizacional e o engajamento dos colaboradores. Através de pesquisas rápidas, intuitivas e anônimas, as empresas podem capturar o sentimento real de suas equipes e tomar decisões baseadas em dados.
+PulsoRH é uma plataforma moderna de **SaaS (Software as a Service)** focada em medir o pulso da cultura organizacional e o engajamento dos colaboradores. Além de pesquisas intuitivas, o sistema oferece um ecossistema completo para gestão de talentos, departamentos e controle de acesso (RBAC).
 
 ## 🚀 Tecnologias
 
-O projeto foi construído com as tecnologias mais modernas do ecossistema front-end:
+O projeto utiliza um stack moderno e robusto para garantir performance e escalabilidade:
 
-- **React 19**: Biblioteca principal para interfaces de usuário.
-- **Vite 8**: Ferramenta de build ultra-rápida.
-- **TypeScript**: Tipagem estática para maior segurança e produtividade.
-- **Tailwind CSS v4**: Framework CSS utilitário para design rápido e responsivo.
-- **Zustand**: Gerenciamento de estado leve e escalável.
-- **Lucide React**: Biblioteca de ícones premium.
-- **Framer Motion**: Animações fluidas e interações modernas.
+### Frontend
+
+- **React 19** & **Vite 8**: Base ultra-rápida para a interface.
+- **TypeScript**: Segurança de tipos em todo o fluxo de dados.
+- **Tailwind CSS v4**: Design system utilitário e responsivo.
+- **TanStack Query (React Query)**: Sincronização de estado servidor/cliente.
+- **Zustand**: Gerenciamento de estado global leve.
+- **Lucide React**: Ícones premium e consistentes.
+
+### Backend & Persistência
+
+- **Node.js** com **Express**: Servidor API RESTful.
+- **Prisma ORM**: Modelagem de dados e interface com o banco.
+- **SQLite**: Banco de dados relacional local e eficiente.
 
 ## 🛠️ Funcionalidades Principais
 
-- **Construtor de Pesquisas**: Interface intuitiva para criar e editar questionários.
-- **Métricas Estratégicas**:
-  - **Sentimento**: Medição de estado emocional via emoticons.
-  - **Escala Numérica**: Ideal para NPS e intensidades.
-  - **Dicotômica**: Perguntas de Sim/Não ou Fatos Objetivos.
-  - **Escalas Likert**: Medição de Concordância e Frequência com guias visuais.
-- **Preview em Tempo Real**: Visualize exatamente como o colaborador verá a pesquisa.
+### 📋 Gestão de Pesquisas
+
+- **Construtor Intuitivo**: Criação de questionários com múltiplos tipos de métricas (Sentimento, Escala Likert, Dicotômica, Slider).
+- **Preview em Tempo Real**: Visualização imediata da experiência do colaborador.
 - **Multi-idioma**: Suporte nativo para Português (PT-BR) e Inglês (EN).
-- **Flexibilidade**: Opções para permitir comentários em cada pergunta.
+
+### 👥 Gestão de Talentos (Novo)
+
+- **Controle de Colaboradores**: Cadastro completo, edição de perfis e status de atividade.
+- **Hub de Departamentos**: Gestão centralizada de setores com personalização visual (cores dinâmicas).
+- **Controle de Acesso (RBAC)**: Permissões distintas para `ADMIN`, `HR` e `USER`.
+
+### 🎨 Experiência do Usuário (UX)
+
+- **Layout Inteligente**: Sidebar retrátil (collapsible) para otimização de espaço.
+- **Header Dinâmico**: Navegação limpa e sincronizada com o estado da aplicação.
+- **Design Premium**: Foco em acessibilidade e estética moderna.
 
 ## 🏁 Pré-requisitos
 
-Antes de começar, você precisará ter instalado em sua máquina:
-
-- [Node.js](https://nodejs.org/en/) (recomendado v18.0.0 ou superior)
-- [npm](https://www.npmjs.com/) (geralmente vem com o Node)
+- [Node.js](https://nodejs.org/en/) (v18.0.0 ou superior)
+- [npm](https://www.npmjs.com/)
 
 ## 💻 Como Rodar o Projeto
 
-1. **Clone o repositório:**
-
-   ```bash
-   git clone <url-do-repositorio>
-   cd PulsoRH
-   ```
-
-2. **Instale as dependências:**
+1. **Instale as dependências:**
 
    ```bash
    npm install
    ```
 
-3. **Inicie o servidor de desenvolvimento:**
+2. **Prepare o Banco de Dados (Prisma):**
+
+   ```bash
+   npx prisma migrate dev --name init
+   npx prisma generate
+   ```
+
+3. **Inicie o Servidor Backend:**
+
+   ```bash
+   npm run server
+   ```
+
+4. **Inicie o Frontend (em outro terminal):**
 
    ```bash
    npm run dev
    ```
 
-4. **Acesse no navegador:**
-   O projeto estará rodando em `http://localhost:5173`.
+5. **Acesse:** `http://localhost:5173`
 
 ## 📜 Scripts Disponíveis
 
-- `npm run dev`: Inicia o servidor de desenvolvimento.
-- `npm run build`: Gera a build de produção otimizada.
-- `npm run lint`: Executa a verificação de linting do código.
-- `npm run preview`: Visualiza a build de produção localmente.
+- `npm run dev`: Servidor de desenvolvimento frontend.
+- `npm run server`: Servidor API backend (ts-node).
+- `npm run build`: Build de produção do frontend.
+- `npm run lint`: Verificação de padrões de código.
+- `npx prisma studio`: Interface visual para navegar nos dados do banco.
 
 ---
 
-Desenvolvido com foco em excelência técnica e experiência do usuário.
+Desenvolvido para transformar a cultura organizacional através de dados e transparência.
