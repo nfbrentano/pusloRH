@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, FileText, Plus, ChevronRight, X, LogOut } from 'lucide-react';
+import { LayoutDashboard, FileText, Plus, ChevronRight, X, LogOut, Users } from 'lucide-react';
+import { ROUTES } from '../routes/config';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { useLocaleStore } from '../store/useLocaleStore';
@@ -22,10 +23,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate(ROUTES.LOGIN);
   };
 
   const isAdmin = user?.role === 'ADMIN';
+  const isHR = user?.role === 'HR';
+  const canManageSurveys = isAdmin || isHR;
 
   const sections = [
     {
@@ -34,14 +37,20 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         {
           name: t('sidebar.dashboard'),
           icon: LayoutDashboard,
-          path: '/dashboard',
-          show: true, // Everyone can see dashboard (though content may vary)
+          path: ROUTES.DASHBOARD,
+          show: true,
+        },
+        {
+          name: t('sidebar.employees'),
+          icon: Users,
+          path: ROUTES.EMPLOYEES,
+          show: isAdmin, // Only Admin sees employees management
         },
         {
           name: t('sidebar.surveys'),
           icon: FileText,
-          path: '/builder',
-          show: isAdmin, // Only Admin sees survey management
+          path: ROUTES.BUILDER_NEW,
+          show: canManageSurveys, // Admin and HR see survey management
         },
       ].filter((item) => item.show),
     },
@@ -143,9 +152,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         </div>
 
         <div className="flex flex-col gap-2">
-          {isAdmin && (
+          {canManageSurveys && (
             <NavLink
-              to="/builder"
+              to={ROUTES.BUILDER_NEW}
               className="w-full flex items-center justify-center space-x-2 bg-signature-gradient text-on-primary py-3 px-4 rounded-2xl font-bold shadow-lg shadow-primary/25 hover:opacity-90 transition-all active:scale-[0.98]"
             >
               <Plus className="w-5 h-5" />

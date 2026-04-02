@@ -36,7 +36,7 @@ export interface Response {
 export type Locale = 'pt' | 'en';
 export type TranslationKey = string;
 
-export type UserRole = 'ADMIN' | 'USER';
+export type UserRole = 'ADMIN' | 'USER' | 'HR';
 
 export interface User {
   id: string;

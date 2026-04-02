@@ -22,6 +22,7 @@ export const translations = {
       dashboard: 'Dashboard',
       surveys: 'Pesquisas',
       new_survey: 'Nova Pesquisa',
+      employees: 'Colaboradores',
       admin: 'Admin Master',
     },
     dashboard: {
@@ -143,8 +144,16 @@ export const translations = {
       login_button: 'Entrar na Plataforma',
       select_role: 'Selecione seu perfil de acesso',
       admin_role: 'Administrador (Gestão e Dashboard)',
+      hr_role: 'Recursos Humanos (RH)',
       user_role: 'Colaborador (Apenas responder)',
       error_message: 'Credenciais inválidas. Tente novamente.',
+    },
+    employees: {
+      title: 'Colaboradores',
+      management: 'Gestão de Talentos',
+      subtitle: 'Acompanhe e gerencie {count} colaboradores.',
+      search_placeholder: 'Buscar por nome ou e-mail...',
+      add_new: 'Novo Colaborador',
     },
   },
   en: {
@@ -167,6 +176,7 @@ export const translations = {
       dashboard: 'Dashboard',
       surveys: 'Surveys',
       new_survey: 'New Survey',
+      employees: 'Employees',
       admin: 'Admin Master',
     },
     dashboard: {
@@ -287,8 +297,16 @@ export const translations = {
       login_button: 'Sign in to Platform',
       select_role: 'Select your access profile',
       admin_role: 'Administrator (Management & Dashboard)',
+      hr_role: 'Human Resources (HR)',
       user_role: 'Employee (Respond only)',
       error_message: 'Invalid credentials. Please try again.',
+    },
+    employees: {
+      title: 'Employees',
+      management: 'Talent Management',
+      subtitle: 'Track and manage {count} employees.',
+      search_placeholder: 'Search by name or email...',
+      add_new: 'Add New Employee',
     },
   },
 };
