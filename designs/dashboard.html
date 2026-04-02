@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+
+<html class="light" lang="pt-br"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PulsoRH - Active Surveys</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Manrope:wght@700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Material Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-tertiary-container": "#8bf088",
+                        "on-secondary-container": "#217128",
+                        "secondary-fixed": "#a3f69c",
+                        "primary-fixed": "#d6e3ff",
+                        "surface-bright": "#f8f9fb",
+                        "inverse-on-surface": "#eff1f3",
+                        "secondary-container": "#a0f399",
+                        "on-error-container": "#93000a",
+                        "on-primary": "#ffffff",
+                        "outline": "#727783",
+                        "error": "#ba1a1a",
+                        "tertiary": "#005413",
+                        "surface-container-high": "#e6e8ea",
+                        "secondary-fixed-dim": "#88d982",
+                        "surface-container-lowest": "#ffffff",
+                        "on-background": "#191c1e",
+                        "error-container": "#ffdad6",
+                        "surface-container-highest": "#e0e3e5",
+                        "on-tertiary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "on-primary-fixed": "#001b3d",
+                        "surface": "#f8f9fb",
+                        "on-secondary-fixed": "#002204",
+                        "on-secondary": "#ffffff",
+                        "surface-dim": "#d8dadc",
+                        "surface-variant": "#e0e3e5",
+                        "tertiary-fixed-dim": "#78dc77",
+                        "inverse-surface": "#2d3133",
+                        "background": "#f8f9fb",
+                        "on-tertiary-fixed-variant": "#005313",
+                        "secondary": "#1b6d24",
+                        "surface-container": "#eceef0",
+                        "on-surface": "#191c1e",
+                        "tertiary-fixed": "#94f990",
+                        "on-surface-variant": "#424752",
+                        "on-tertiary-fixed": "#002204",
+                        "on-secondary-fixed-variant": "#005312",
+                        "tertiary-container": "#006f1d",
+                        "inverse-primary": "#a9c7ff",
+                        "surface-container-low": "#f2f4f6",
+                        "primary-fixed-dim": "#a9c7ff",
+                        "on-primary-fixed-variant": "#00468c",
+                        "outline-variant": "#c2c6d4",
+                        "on-primary-container": "#c8daff",
+                        "primary": "#00478d",
+                        "surface-tint": "#005db6",
+                        "primary-container": "#005eb8"
+                    },
+                    fontFamily: {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3 { font-family: 'Manrope', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<!-- SideNavBar (Authority: JSON Component) -->
+<aside class="h-screen w-64 left-0 top-0 fixed bg-surface-container-low dark:bg-slate-900 flex flex-col p-4 space-y-2 z-40 hidden md:flex">
+<div class="mb-8 px-2 py-4 flex items-center space-x-3">
+<div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">pulse_alert</span>
+</div>
+<div>
+<h2 class="text-xl font-black text-blue-800 dark:text-blue-300 leading-none">PulsoRH</h2>
+<p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">HR Authority</p>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center space-x-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-blue-600 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-manrope font-semibold text-sm">Dashboard</span>
+</a>
+<!-- Active Tab: Surveys -->
+<a class="flex items-center space-x-3 px-4 py-3 bg-white dark:bg-slate-800 text-blue-700 dark:text-blue-300 rounded-lg shadow-sm font-bold transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="poll" style="font-variation-settings: 'FILL' 1;">poll</span>
+<span class="font-manrope font-semibold text-sm">Surveys</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-blue-600 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-manrope font-semibold text-sm">Reports</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-blue-600 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-manrope font-semibold text-sm">Settings</span>
+</a>
+</nav>
+<div class="mt-auto pt-6">
+<button class="w-full flex items-center justify-center space-x-2 bg-gradient-to-br from-primary to-primary-container text-on-primary py-3 px-4 rounded-xl font-semibold shadow-lg shadow-primary/20 hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-sm">add</span>
+<span class="text-sm">New Survey</span>
+</button>
+</div>
+</aside>
+<!-- TopAppBar (Authority: JSON Component) -->
+<header class="fixed top-0 z-50 flex justify-between items-center px-8 h-16 w-full md:pl-72 bg-surface/80 backdrop-blur-md dark:bg-slate-900/80 shadow-sm dark:shadow-none">
+<div class="flex items-center space-x-4">
+<h1 class="text-2xl font-bold tracking-tighter text-blue-800 dark:text-blue-300">Active Surveys</h1>
+</div>
+<div class="flex items-center space-x-6">
+<div class="hidden lg:flex items-center bg-surface-container px-4 py-2 rounded-full">
+<span class="material-symbols-outlined text-outline mr-2 text-lg">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-48 text-on-surface" placeholder="Search surveys..." type="text"/>
+</div>
+<div class="flex items-center space-x-4">
+<button class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+<span class="material-symbols-outlined text-slate-600 dark:text-slate-400" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+<span class="material-symbols-outlined text-slate-600 dark:text-slate-400" data-icon="help_outline">help_outline</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border-2 border-primary/20">
+<img alt="User avatar" class="w-full h-full object-cover" data-alt="professional headshot of a smiling business executive with soft lighting and neutral background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAfGRRrCh8Du8jGEiwJPWh26QeU3Txg9LyiiHs4ulmRNOn2zZXOu6DaRNe_ut_7LLBl6kT3X9-DleHwoTx5Zi_LoIeo3oJK9R7CtIzK3XalQQhM_tiXOSNUIgSwr9xwAkgwq9SRRcCCecF1t5MZHqQleuzaJ0A3ELzid5jI_YePWunv1y3c3zqIRnxEcIqWsBztL33f5m-abIYz3LcV83HOxmbn1Eb7JWmkszDfUdnQa6VGkbH7qyoEy4WO-47snkl6lw8VnRetjto"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="pt-24 pb-20 md:pb-8 md:pl-72 pr-8 min-h-screen">
+<!-- Header Actions (Asymmetric Layout) -->
+<div class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6 px-4">
+<div class="max-w-2xl">
+<p class="text-primary font-semibold tracking-wider uppercase text-xs mb-2">Operational Overview</p>
+<h2 class="text-4xl font-extrabold text-on-surface tracking-tight leading-tight">Manage the pulse of your <span class="text-primary italic">organization</span>.</h2>
+</div>
+<div class="flex space-x-3">
+<button class="bg-white text-primary border border-primary/10 px-6 py-3 rounded-xl font-bold flex items-center space-x-2 shadow-sm hover:bg-surface-container-low transition-all">
+<span class="material-symbols-outlined text-xl">filter_list</span>
+<span>Filter</span>
+</button>
+<button class="bg-primary text-white px-6 py-3 rounded-xl font-bold flex items-center space-x-2 shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all">
+<span class="material-symbols-outlined text-xl">add_circle</span>
+<span>Create New Survey</span>
+</button>
+</div>
+</div>
+<!-- Surveys Bento Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 px-4">
+<!-- Survey Card 1 -->
+<div class="group bg-surface-container-lowest rounded-3xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 relative overflow-hidden">
+<div class="flex justify-between items-start mb-6">
+<span class="px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container text-[10px] font-bold uppercase tracking-wider">Em Aberto</span>
+<div class="flex space-x-1">
+<button class="p-2 rounded-lg hover:bg-surface-container text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined text-lg">edit</span>
+</button>
+<button class="p-2 rounded-lg hover:bg-surface-container text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined text-lg">visibility</span>
+</button>
+</div>
+</div>
+<div class="mb-8">
+<h3 class="text-xl font-bold text-on-surface mb-1 group-hover:text-primary transition-colors">Engajamento Semestral 2026</h3>
+<div class="flex items-center text-xs text-on-surface-variant">
+<span class="material-symbols-outlined text-xs mr-1">calendar_today</span>
+<span>Last response: Today, 14:20</span>
+</div>
+</div>
+<div class="flex items-center space-x-6 mb-8">
+<!-- Progress Circle Mini-Chart -->
+<div class="relative w-16 h-16 flex items-center justify-center">
+<svg class="w-full h-full transform -rotate-90">
+<circle class="text-surface-container-high" cx="32" cy="32" fill="transparent" r="28" stroke="currentColor" stroke-width="6"></circle>
+<circle class="text-secondary" cx="32" cy="32" fill="transparent" r="28" stroke="currentColor" stroke-dasharray="176" stroke-dashoffset="49" stroke-width="6"></circle>
+</svg>
+<span class="absolute text-sm font-bold text-on-surface">72%</span>
+</div>
+<div>
+<p class="text-2xl font-black text-on-surface">1,240</p>
+<p class="text-xs text-on-surface-variant font-medium">Responses collected</p>
+</div>
+</div>
+<button class="w-full py-4 bg-primary-container/10 text-primary rounded-2xl font-bold flex items-center justify-center space-x-2 group-hover:bg-primary group-hover:text-white transition-all">
+<span class="material-symbols-outlined text-xl">link</span>
+<span>Generate Link</span>
+</button>
+</div>
+<!-- Survey Card 2 -->
+<div class="group bg-surface-container-lowest rounded-3xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 relative overflow-hidden">
+<div class="flex justify-between items-start mb-6">
+<span class="px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container text-[10px] font-bold uppercase tracking-wider">Em Aberto</span>
+<div class="flex space-x-1">
+<button class="p-2 rounded-lg hover:bg-surface-container text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined text-lg">edit</span>
+</button>
+<button class="p-2 rounded-lg hover:bg-surface-container text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined text-lg">visibility</span>
+</button>
+</div>
+</div>
+<div class="mb-8">
+<h3 class="text-xl font-bold text-on-surface mb-1 group-hover:text-primary transition-colors">Clima Organizacional Q1</h3>
+<div class="flex items-center text-xs text-on-surface-variant">
+<span class="material-symbols-outlined text-xs mr-1">calendar_today</span>
+<span>Last response: Oct 12, 2025</span>
+</div>
+</div>
+<div class="flex items-center space-x-6 mb-8">
+<div class="relative w-16 h-16 flex items-center justify-center">
+<svg class="w-full h-full transform -rotate-90">
+<circle class="text-surface-container-high" cx="32" cy="32" fill="transparent" r="28" stroke="currentColor" stroke-width="6"></circle>
+<circle class="text-primary" cx="32" cy="32" fill="transparent" r="28" stroke="currentColor" stroke-dasharray="176" stroke-dashoffset="100" stroke-width="6"></circle>
+</svg>
+<span class="absolute text-sm font-bold text-on-surface">43%</span>
+</div>
+<div>
+<p class="text-2xl font-black text-on-surface">854</p>
+<p class="text-xs text-on-surface-variant font-medium">Responses collected</p>
+</div>
+</div>
+<button class="w-full py-4 bg-primary-container/10 text-primary rounded-2xl font-bold flex items-center justify-center space-x-2 group-hover:bg-primary group-hover:text-white transition-all">
+<span class="material-symbols-outlined text-xl">link</span>
+<span>Generate Link</span>
+</button>
+</div>
+<!-- Survey Card 3 (Empty/New State Style) -->
+<div class="group bg-surface-container-low border-2 border-dashed border-outline-variant/30 rounded-3xl p-6 flex flex-col items-center justify-center text-center space-y-4 hover:border-primary/50 transition-all cursor-pointer">
+<div class="w-16 h-16 rounded-full bg-white flex items-center justify-center text-primary shadow-sm">
+<span class="material-symbols-outlined text-3xl">post_add</span>
+</div>
+<div>
+<h3 class="text-lg font-bold text-on-surface">Launch a Pulse</h3>
+<p class="text-sm text-on-surface-variant px-8">Create a quick 5-question pulse survey to check the mood of your team.</p>
+</div>
+<button class="text-primary font-bold text-sm flex items-center">
+                    Get started
+                    <span class="material-symbols-outlined ml-1">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Featured Analysis (Tonal Layering Example) -->
+<section class="mt-12 px-4">
+<div class="bg-surface-container-high/50 rounded-[2.5rem] p-8 md:p-12 flex flex-col md:flex-row items-center gap-12">
+<div class="flex-1 space-y-6">
+<div class="inline-flex items-center px-4 py-2 rounded-full bg-tertiary-fixed text-on-tertiary-fixed text-xs font-bold">
+<span class="material-symbols-outlined text-xs mr-2">auto_awesome</span>
+                        AI INSIGHT READY
+                    </div>
+<h2 class="text-3xl font-extrabold tracking-tight">Overall participation is <span class="text-secondary">up by 12%</span> this month.</h2>
+<p class="text-lg text-on-surface-variant leading-relaxed">Your teams are more vocal than ever. Use this data to drive meaningful change in the upcoming quarterly review.</p>
+<button class="bg-on-background text-white px-8 py-4 rounded-2xl font-bold hover:opacity-90 transition-opacity">
+                        View Detailed Insights
+                    </button>
+</div>
+<div class="flex-1 w-full h-64 rounded-3xl bg-surface-container-lowest shadow-xl p-6 relative">
+<div class="flex items-end justify-between h-full space-x-2">
+<div class="w-full bg-primary/10 rounded-t-xl h-[40%]"></div>
+<div class="w-full bg-primary/20 rounded-t-xl h-[55%]"></div>
+<div class="w-full bg-primary/30 rounded-t-xl h-[45%]"></div>
+<div class="w-full bg-primary/50 rounded-t-xl h-[70%]"></div>
+<div class="w-full bg-primary/70 rounded-t-xl h-[60%]"></div>
+<div class="w-full bg-secondary rounded-t-xl h-[90%]"></div>
+<div class="w-full bg-secondary/80 rounded-t-xl h-[85%]"></div>
+</div>
+<div class="absolute top-6 left-6">
+<p class="text-xs font-bold text-outline uppercase">Response Volume</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar (Authority: JSON Component - Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-surface/90 backdrop-blur-xl dark:bg-slate-900/90 shadow-[0_-4px_12px_rgba(0,0,0,0.05)] rounded-t-3xl border-t border-slate-100 dark:border-slate-800">
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-1 active:bg-slate-100 transition-all duration-200 scale-90" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-inter text-[10px] font-medium">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-200 rounded-2xl px-5 py-1 transition-all duration-200 scale-90" href="#">
+<span class="material-symbols-outlined" data-icon="edit_document" style="font-variation-settings: 'FILL' 1;">edit_document</span>
+<span class="font-inter text-[10px] font-medium">Surveys</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-1 active:bg-slate-100 transition-all duration-200 scale-90" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-inter text-[10px] font-medium">Account</span>
+</a>
+</nav>
+</body></html>
