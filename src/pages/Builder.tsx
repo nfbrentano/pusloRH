@@ -14,9 +14,13 @@ import {
   MessageSquare,
   Smile,
   SlidersHorizontal,
-  X
+  X,
+  CheckSquare,
+  BarChart3,
+  Activity
 } from 'lucide-react';
 import PreviewModal from '../components/PreviewModal';
+import InfoTooltip from '../components/InfoTooltip';
 
 const Builder: React.FC = () => {
   const navigate = useNavigate();
@@ -258,28 +262,77 @@ const Builder: React.FC = () => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-end">
-                <div>
+                <div className="col-span-full">
                   <label className="block text-sm font-semibold text-on-surface-variant mb-3">{t('builder.response_type')}</label>
-                  <div className="flex bg-surface-container-low p-1 rounded-xl">
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-2 bg-surface-container-low p-1.5 rounded-2xl">
                     <button 
                       type="button"
                       onClick={() => updateQuestion(q.id, { type: 'Emoticons' })}
-                      className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg transition-all ${
-                        q.type === 'Emoticons' ? 'bg-white shadow-sm text-primary font-bold' : 'text-slate-500 font-medium'
+                      className={`flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-xl transition-all ${
+                        q.type === 'Emoticons' ? 'bg-white shadow-md text-primary font-bold' : 'text-slate-500 font-medium hover:bg-white/50'
                       }`}
                     >
-                      <Smile className="w-5 h-5" />
-                      <span>Emoticons</span>
+                      <div className="flex items-center gap-1">
+                        <Smile className="w-5 h-5" />
+                        <InfoTooltip text={t('builder.type_emoticons_tooltip')} />
+                      </div>
+                      <span className="text-[10px]">{t('builder.type_emoticons')}</span>
                     </button>
+                    
                     <button 
                       type="button"
                       onClick={() => updateQuestion(q.id, { type: 'Slider' })}
-                      className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg transition-all ${
-                        q.type === 'Slider' ? 'bg-white shadow-sm text-primary font-bold' : 'text-slate-500 font-medium'
+                      className={`flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-xl transition-all ${
+                        q.type === 'Slider' ? 'bg-white shadow-md text-primary font-bold' : 'text-slate-500 font-medium hover:bg-white/50'
                       }`}
                     >
-                      <SlidersHorizontal className="w-5 h-5" />
-                      <span>Slider</span>
+                      <div className="flex items-center gap-1">
+                        <SlidersHorizontal className="w-5 h-5" />
+                        <InfoTooltip text={t('builder.type_slider_tooltip')} />
+                      </div>
+                      <span className="text-[10px]">{t('builder.type_slider')}</span>
+                    </button>
+
+                    <button 
+                      type="button"
+                      onClick={() => updateQuestion(q.id, { type: 'Binary' })}
+                      className={`flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-xl transition-all ${
+                        q.type === 'Binary' ? 'bg-white shadow-md text-primary font-bold' : 'text-slate-500 font-medium hover:bg-white/50'
+                      }`}
+                    >
+                      <div className="flex items-center gap-1">
+                        <CheckSquare className="w-5 h-5" />
+                        <InfoTooltip text={t('builder.type_binary_tooltip')} />
+                      </div>
+                      <span className="text-[10px]">{t('builder.type_binary')}</span>
+                    </button>
+
+                    <button 
+                      type="button"
+                      onClick={() => updateQuestion(q.id, { type: 'LikertAgreement' })}
+                      className={`flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-xl transition-all ${
+                        q.type === 'LikertAgreement' ? 'bg-white shadow-md text-primary font-bold' : 'text-slate-500 font-medium hover:bg-white/50'
+                      }`}
+                    >
+                      <div className="flex items-center gap-1">
+                        <BarChart3 className="w-5 h-5" />
+                        <InfoTooltip text={t('builder.type_likert_agreement_tooltip')} />
+                      </div>
+                      <span className="text-[10px]">{t('builder.type_likert_agreement')}</span>
+                    </button>
+
+                    <button 
+                      type="button"
+                      onClick={() => updateQuestion(q.id, { type: 'LikertFrequency' })}
+                      className={`flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-xl transition-all ${
+                        q.type === 'LikertFrequency' ? 'bg-white shadow-md text-primary font-bold' : 'text-slate-500 font-medium hover:bg-white/50'
+                      }`}
+                    >
+                      <div className="flex items-center gap-1">
+                        <Activity className="w-5 h-5" />
+                        <InfoTooltip text={t('builder.type_likert_frequency_tooltip')} />
+                      </div>
+                      <span className="text-[10px]">{t('builder.type_likert_frequency')}</span>
                     </button>
                   </div>
                 </div>

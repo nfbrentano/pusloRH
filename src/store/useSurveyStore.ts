@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-export type QuestionType = 'Emoticons' | 'Slider';
+export type QuestionType = 'Emoticons' | 'Slider' | 'Binary' | 'LikertAgreement' | 'LikertFrequency';
 
 export interface Question {
   id: string;
