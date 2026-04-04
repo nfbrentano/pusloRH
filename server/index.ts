@@ -5,6 +5,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 
+// --- CONFIGURATION ---
 dotenv.config();
 
 const prisma = new PrismaClient();
@@ -13,14 +14,15 @@ const PORT = process.env.PORT || 3001;
 const JWT_SECRET = process.env.JWT_SECRET || 'pulsorh-dev-secret-change-in-prod';
 const JWT_EXPIRES_IN = '6h';
 
-// --- CORS ---
+// --- MIDDLEWARES ---
 const allowedOrigins = (process.env.CORS_ORIGINS || 'http://localhost:5173')
   .split(',')
   .map((o) => o.trim());
+
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (e.g., curl, mobile apps) or whitelisted origins
+      // Allow requests with no origin or whitelisted origins
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
@@ -34,25 +36,12 @@ app.use(
 app.use(express.json());
 
 // --- TYPES ---
-interface QuestionInput {
-  text: string;
-  type: string;
-  allowComment: boolean;
-}
-
-interface ResponseInput {
-  questionId: string;
-  value: string | number;
-  comment?: string;
-}
-
 interface JwtPayload {
   userId: string;
   role: string;
 }
 
-// Prisma User type with passwordHash (field added via migration)
-type PrismaUser = {
+interface UserOutput {
   id: string;
   email: string;
   name: string;
@@ -60,10 +49,23 @@ type PrismaUser = {
   avatar: string | null;
   status: string;
   departmentId: string | null;
-  passwordHash: string | null;
   createdAt: Date;
-  department?: unknown;
-};
+}
+
+interface QuestionInput {
+  text: string;
+  type: string;
+  allowComment: boolean;
+}
+
+interface UserUpdateInput {
+  name: string;
+  email: string;
+  role: string;
+  departmentId?: string;
+  status: string;
+  passwordHash?: string;
+}
 
 // --- AUTH MIDDLEWARE ---
 function authenticateToken(req: Request, res: Response, next: NextFunction): void {
@@ -82,57 +84,19 @@ function authenticateToken(req: Request, res: Response, next: NextFunction): voi
   }
 }
 
-// --- SEED INITIAL DATA ---
-async function seed() {
-  const departments = ['RH', 'Engenharia', 'Vendas', 'Marketing', 'Operações'];
-  const colors = ['#ec4899', '#3b82f6', '#f59e0b', '#10b981', '#8b5cf6'];
-
-  for (let i = 0; i < departments.length; i++) {
-    const dept = await prisma.department.findUnique({ where: { name: departments[i] } });
-    if (!dept) {
-      await prisma.department.create({ data: { name: departments[i], color: colors[i] } });
-    }
-  }
-
-  // Seed Admin with hashed password
-  const adminEmail = 'admin@pulsorh.com';
-  const defaultPassword = 'PulsoRH@2026!';
-  const existing = await prisma.user.findUnique({ where: { email: adminEmail } });
-
-  if (!existing) {
-    const rhDept = await prisma.department.findUnique({ where: { name: 'RH' } });
-    const passwordHash = await bcrypt.hash(defaultPassword, 12);
-    await prisma.user.create({
-      data: {
-        email: adminEmail,
-        name: 'Admin Master',
-        role: 'ADMIN',
-        departmentId: rhDept?.id,
-        passwordHash,
-        avatar:
-          'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1287&auto=format&fit=crop',
-      },
-    });
-    console.log('✅  Admin criado. Senha padrão:', defaultPassword);
-    console.log('⚠️   Troque a senha após o primeiro login em produção!');
-  } else if (!(existing as PrismaUser).passwordHash) {
-    // Backfill hash for existing admin without password
-    const passwordHash = await bcrypt.hash(defaultPassword, 12);
-    await prisma.user.update({ where: { email: adminEmail }, data: { passwordHash } });
-    console.log('✅  Hash adicionado ao admin existente. Senha padrão:', defaultPassword);
-  }
-}
-seed();
-
-// --- ROUTES ---
-
-function sanitizeUser(user: PrismaUser) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function sanitizeUser(user: any): UserOutput {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { passwordHash, ...safe } = user;
-  return safe;
+  return safe as UserOutput;
 }
 
-// --- AUTH ---
+// --- AUTH ROUTES ---
+
+/**
+ * POST /api/auth/login
+ * Public endpoint to authenticate users.
+ */
 app.post('/api/auth/login', async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, password } = req.body;
@@ -141,10 +105,10 @@ app.post('/api/auth/login', async (req: Request, res: Response): Promise<void> =
       return;
     }
 
-    const user = (await prisma.user.findUnique({
+    const user = await prisma.user.findUnique({
       where: { email: String(email) },
       include: { department: true },
-    })) as PrismaUser | null;
+    });
 
     if (!user || !user.passwordHash) {
       res.status(401).json({ error: 'Credenciais inválidas.' });
@@ -173,13 +137,14 @@ app.post('/api/auth/login', async (req: Request, res: Response): Promise<void> =
   }
 });
 
-// USERS (all protected)
+// --- USER ROUTES (Protected) ---
+
 app.get('/api/users', authenticateToken, async (_req: Request, res: Response) => {
   try {
-    const users = (await prisma.user.findMany({
+    const users = await prisma.user.findMany({
       include: { department: true },
       orderBy: { createdAt: 'desc' },
-    })) as PrismaUser[];
+    });
     res.json(users.map(sanitizeUser));
   } catch {
     res.status(500).json({ error: 'Failed to fetch users' });
@@ -188,19 +153,12 @@ app.get('/api/users', authenticateToken, async (_req: Request, res: Response) =>
 
 app.post('/api/users', authenticateToken, async (req: Request, res: Response) => {
   try {
-    const { email, name, role, departmentId, avatar, password } = req.body as {
-      email: string;
-      name: string;
-      role: string;
-      departmentId?: string;
-      avatar?: string;
-      password?: string;
-    };
+    const { email, name, role, departmentId, avatar, password } = req.body;
     const passwordHash = password ? await bcrypt.hash(password, 12) : undefined;
-    const user = (await prisma.user.create({
+    const user = await prisma.user.create({
       data: { email, name, role, departmentId, avatar, passwordHash },
       include: { department: true },
-    })) as PrismaUser;
+    });
     res.status(201).json(sanitizeUser(user));
   } catch (error) {
     console.error('Error creating user:', error);
@@ -211,23 +169,16 @@ app.post('/api/users', authenticateToken, async (req: Request, res: Response) =>
 app.put('/api/users/:id', authenticateToken, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { name, email, role, departmentId, status, password } = req.body as {
-      name: string;
-      email: string;
-      role: string;
-      departmentId?: string;
-      status?: string;
-      password?: string;
-    };
-    const data: Record<string, unknown> = { name, email, role, departmentId, status };
+    const { name, email, role, departmentId, status, password } = req.body;
+    const data: UserUpdateInput = { name, email, role, departmentId, status };
     if (password) {
       data.passwordHash = await bcrypt.hash(password, 12);
     }
-    const user = (await prisma.user.update({
+    const user = await prisma.user.update({
       where: { id: String(id) },
       data,
       include: { department: true },
-    })) as PrismaUser;
+    });
     res.json(sanitizeUser(user));
   } catch {
     res.status(500).json({ error: 'Failed to update user' });
@@ -244,7 +195,8 @@ app.delete('/api/users/:id', authenticateToken, async (req: Request, res: Respon
   }
 });
 
-// DEPARTMENTS (GET public, mutations protected)
+// --- DEPARTMENT ROUTES (Mutations Protected) ---
+
 app.get('/api/departments', async (_req: Request, res: Response) => {
   try {
     const depts = await prisma.department.findMany({
@@ -282,7 +234,8 @@ app.delete('/api/departments/:id', authenticateToken, async (req: Request, res: 
   }
 });
 
-// SURVEYS (GET public, mutations protected)
+// --- SURVEY & RESPONSE ROUTES ---
+
 app.get('/api/surveys', async (_req: Request, res: Response) => {
   try {
     const surveys = await prisma.survey.findMany({
@@ -371,12 +324,11 @@ app.put('/api/surveys/:id', authenticateToken, async (req: Request, res: Respons
   }
 });
 
-// RESPONSES (public — respondents don't have accounts)
 app.post('/api/responses', async (req: Request, res: Response) => {
   try {
     const { surveyId, responses } = req.body;
     const createdResponses = await Promise.all(
-      (responses as ResponseInput[]).map((r) =>
+      (responses as { questionId: string; value: string; comment?: string }[]).map((r) =>
         prisma.response.create({
           data: {
             surveyId: String(surveyId),
@@ -403,6 +355,50 @@ app.get('/api/surveys/:id/stats', async (req: Request, res: Response) => {
   }
 });
 
-app.listen(PORT, () => {
+// --- MISC ---
+app.get('/api/health', (_req: Request, res: Response) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// --- INITIALIZATION & SEED ---
+async function bootstrap() {
+  const departments = ['RH', 'Engenharia', 'Vendas', 'Marketing', 'Operações'];
+  const colors = ['#ec4899', '#3b82f6', '#f59e0b', '#10b981', '#8b5cf6'];
+
+  for (let i = 0; i < departments.length; i++) {
+    const dept = await prisma.department.findUnique({ where: { name: departments[i] } });
+    if (!dept) {
+      await prisma.department.create({ data: { name: departments[i], color: colors[i] } });
+    }
+  }
+
+  const adminEmail = 'admin@pulsorh.com';
+  const defaultPassword = 'PulsoRH@2026!';
+  const existing = await prisma.user.findUnique({ where: { email: adminEmail } });
+
+  if (!existing) {
+    const rhDept = await prisma.department.findUnique({ where: { name: 'RH' } });
+    const passwordHash = await bcrypt.hash(defaultPassword, 12);
+    await prisma.user.create({
+      data: {
+        email: adminEmail,
+        name: 'Admin Master',
+        role: 'ADMIN',
+        departmentId: rhDept?.id,
+        passwordHash,
+        avatar:
+          'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1287&auto=format&fit=crop',
+      },
+    });
+    console.log('✅  Admin master initialized.');
+  } else if (!existing.passwordHash) {
+    const passwordHash = await bcrypt.hash(defaultPassword, 12);
+    await prisma.user.update({ where: { email: adminEmail }, data: { passwordHash } });
+    console.log('✅  Admin password hash updated.');
+  }
+}
+
+app.listen(PORT, async () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
+  await bootstrap().catch(console.error);
 });
