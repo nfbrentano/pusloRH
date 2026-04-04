@@ -42,7 +42,7 @@ const AddEmployee: React.FC = () => {
 
     try {
       const password = generateRandomPassword();
-      await createUserMutation.mutateAsync(formData);
+      await createUserMutation.mutateAsync({ ...formData, password });
       setGeneratedPassword(password);
       setSuccess(true);
     } catch {

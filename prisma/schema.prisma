@@ -16,6 +16,7 @@ model User {
   status       String      @default("Active") // 'Active' or 'Inactive'
   departmentId String?
   department   Department? @relation(fields: [departmentId], references: [id])
+  passwordHash String?     // bcrypt hash — null for legacy/mock users
   createdAt    DateTime    @default(now())
 }
 

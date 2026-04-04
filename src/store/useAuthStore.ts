@@ -4,9 +4,10 @@ import type { User } from '../types';
 
 interface AuthState {
   user: User | null;
+  token: string | null;
   isAuthenticated: boolean;
   lastLogin: number | null;
-  login: (user: User) => void;
+  login: (user: User, token: string) => void;
   logout: () => void;
   checkSession: () => boolean;
 }
@@ -17,12 +18,14 @@ export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
       user: null,
+      token: null,
       isAuthenticated: false,
       lastLogin: null,
 
-      login: (user) =>
+      login: (user, token) =>
         set({
           user,
+          token,
           isAuthenticated: true,
           lastLogin: Date.now(),
         }),
@@ -30,6 +33,7 @@ export const useAuthStore = create<AuthState>()(
       logout: () =>
         set({
           user: null,
+          token: null,
           isAuthenticated: false,
           lastLogin: null,
         }),
@@ -40,7 +44,7 @@ export const useAuthStore = create<AuthState>()(
 
         const now = Date.now();
         if (now - lastLogin > SESSION_DURATION) {
-          set({ user: null, isAuthenticated: false, lastLogin: null });
+          set({ user: null, token: null, isAuthenticated: false, lastLogin: null });
           return false;
         }
 

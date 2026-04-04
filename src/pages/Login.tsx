@@ -3,16 +3,11 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/useAuthStore';
 import { useLocaleStore } from '../store/useLocaleStore';
 import { ROUTES } from '../routes/config';
-import type { UserRole } from '../types';
-import {
-  Mail,
-  Lock,
-  LogIn,
-  ShieldCheck,
-  User as UserIcon,
-  Briefcase,
-  AlertCircle,
-} from 'lucide-react';
+import { Mail, Lock, LogIn, AlertCircle } from 'lucide-react';
+import axios from 'axios';
+import type { User } from '../types';
+
+const API_URL = 'http://localhost:3001/api';
 
 const Login: React.FC = () => {
   const { t } = useLocaleStore();
@@ -22,53 +17,43 @@ const Login: React.FC = () => {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState<UserRole>('ADMIN');
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const from = location.state?.from?.pathname || ROUTES.DASHBOARD;
 
-  // Redirect if already authenticated and session is valid
   useEffect(() => {
     if (isAuthenticated && checkSession()) {
       navigate(ROUTES.DASHBOARD, { replace: true });
     }
   }, [isAuthenticated, checkSession, navigate]);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
-    // Simple validation
     if (!email || !password) {
-      setError(t('auth.error_message') || 'Por favor, preencha todos os campos.');
+      setError('Por favor, preencha todos os campos.');
       return;
     }
 
-    // In a real app, this would call an API
-    // For demo, we just use the selected role
-    const mockUser = {
-      id: Math.random().toString(36).substr(2, 9),
-      name: role === 'ADMIN' ? 'Admin Master' : role === 'HR' ? 'Recursos Humanos' : 'Colaborador',
-      email:
-        email ||
-        (role === 'ADMIN'
-          ? 'admin@pulsorh.com'
-          : role === 'HR'
-            ? 'hr@pulsorh.com'
-            : 'user@pulsorh.com'),
-      role,
-      status: 'Active',
-      createdAt: new Date().toISOString(),
-      avatar:
-        role === 'ADMIN'
-          ? 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1287&auto=format&fit=crop'
-          : role === 'HR'
-            ? 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=1288&auto=format&fit=crop'
-            : 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?q=80&w=1287&auto=format&fit=crop',
-    };
-
-    login(mockUser);
-    navigate(from, { replace: true });
+    setIsLoading(true);
+    try {
+      const { data } = await axios.post<{ token: string; user: User }>(`${API_URL}/auth/login`, {
+        email,
+        password,
+      });
+      login(data.user, data.token);
+      navigate(from, { replace: true });
+    } catch (err) {
+      if (axios.isAxiosError(err) && err.response?.data?.error) {
+        setError(err.response.data.error);
+      } else {
+        setError('Não foi possível conectar ao servidor. Tente novamente.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -77,7 +62,7 @@ const Login: React.FC = () => {
         <div className="p-8 md:p-12">
           {/* Logo Section */}
           <div className="flex flex-col items-center mb-10">
-            <div className="w-20 h-20 rounded-xl bg-primary flex items-center justify-center shadow-2xl shadow-primary/30 mb-6 animate-float">
+            <div className="w-20 h-20 rounded-xl bg-primary flex items-center justify-center shadow-2xl shadow-primary/30 mb-6">
               <span
                 className="material-symbols-outlined text-white text-5xl"
                 style={{ fontVariationSettings: "'FILL' 1" }}
@@ -92,64 +77,11 @@ const Login: React.FC = () => {
           <form onSubmit={handleLogin} className="space-y-6">
             {/* Error Message */}
             {error && (
-              <div className="bg-error/10 text-error p-4 rounded-2xl flex items-center gap-3 animate-shake">
+              <div className="bg-error/10 text-error p-4 rounded-2xl flex items-center gap-3">
                 <AlertCircle className="w-5 h-5 flex-shrink-0" />
                 <p className="text-sm font-bold">{error}</p>
               </div>
             )}
-
-            {/* Role Selection */}
-            <div className="space-y-3">
-              <label className="text-xs font-black uppercase tracking-widest text-slate-400 block ml-1">
-                {t('auth.select_role')}
-              </label>
-              <div className="grid grid-cols-1 gap-2">
-                <button
-                  type="button"
-                  onClick={() => setRole('ADMIN')}
-                  className={`flex items-center gap-3 p-4 rounded-2xl border-2 transition-all text-left ${
-                    role === 'ADMIN'
-                      ? 'border-primary bg-primary/5 text-primary shadow-sm'
-                      : 'border-slate-100 hover:border-primary/30 text-slate-500'
-                  }`}
-                >
-                  <ShieldCheck
-                    className={`w-5 h-5 ${role === 'ADMIN' ? 'text-primary' : 'text-slate-400'}`}
-                  />
-                  <span className="text-sm font-bold">{t('auth.admin_role')}</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setRole('HR')}
-                  className={`flex items-center gap-3 p-4 rounded-2xl border-2 transition-all text-left ${
-                    role === 'HR'
-                      ? 'border-primary bg-primary/5 text-primary shadow-sm'
-                      : 'border-slate-100 hover:border-primary/30 text-slate-500'
-                  }`}
-                >
-                  <Briefcase
-                    className={`w-5 h-5 ${role === 'HR' ? 'text-primary' : 'text-slate-400'}`}
-                  />
-                  <span className="text-sm font-bold">
-                    {t('auth.hr_role') || 'Recursos Humanos (RH)'}
-                  </span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setRole('USER')}
-                  className={`flex items-center gap-3 p-4 rounded-2xl border-2 transition-all text-left ${
-                    role === 'USER'
-                      ? 'border-primary bg-primary/5 text-primary shadow-sm'
-                      : 'border-slate-100 hover:border-primary/30 text-slate-500'
-                  }`}
-                >
-                  <UserIcon
-                    className={`w-5 h-5 ${role === 'USER' ? 'text-primary' : 'text-slate-400'}`}
-                  />
-                  <span className="text-sm font-bold">{t('auth.user_role')}</span>
-                </button>
-              </div>
-            </div>
 
             {/* Email Field */}
             <div className="space-y-2">
@@ -197,10 +129,17 @@ const Login: React.FC = () => {
 
             <button
               type="submit"
-              className="w-full bg-primary text-white py-4 rounded-2xl font-black text-lg shadow-xl shadow-primary/20 hover:shadow-primary/40 hover:opacity-90 transition-all transform active:scale-[0.98] mt-4 flex items-center justify-center gap-2"
+              disabled={isLoading}
+              className="w-full bg-primary text-white py-4 rounded-2xl font-black text-lg shadow-xl shadow-primary/20 hover:shadow-primary/40 hover:opacity-90 transition-all transform active:scale-[0.98] mt-4 flex items-center justify-center gap-2 disabled:opacity-60"
             >
-              <LogIn className="w-6 h-6" />
-              {t('auth.login_button')}
+              {isLoading ? (
+                <span className="w-6 h-6 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+              ) : (
+                <>
+                  <LogIn className="w-6 h-6" />
+                  {t('auth.login_button')}
+                </>
+              )}
             </button>
           </form>
         </div>

@@ -10,6 +10,7 @@ export interface UserInput {
   role: UserRole;
   departmentId?: string;
   avatar?: string;
+  password?: string;
 }
 
 export const useUsers = () => {
