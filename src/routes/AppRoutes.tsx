@@ -11,6 +11,7 @@ import Respondent from '../pages/Respondent';
 import Employees from '../pages/Employees';
 import AddEmployee from '../pages/AddEmployee';
 import DepartmentHub from '../pages/DepartmentHub';
+import Profile from '../pages/Profile';
 
 import type { UserRole } from '../types';
 
@@ -28,6 +29,7 @@ const routes: RouteConfig[] = [
   // Private Routes (All Roles)
   { path: ROUTES.DASHBOARD, element: <Dashboard />, isPrivate: true },
   { path: ROUTES.RESPONDENT, element: <Respondent />, isPrivate: true },
+  { path: ROUTES.PROFILE, element: <Profile />, isPrivate: true },
 
   // Private Routes (Admin and HR)
   {

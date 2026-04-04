@@ -7,5 +7,6 @@ export const ROUTES = {
   EMPLOYEES: '/employees',
   EMPLOYEES_NEW: '/employees/new',
   DEPARTMENTS: '/departments',
+  PROFILE: '/profile',
   ROOT: '/',
 };

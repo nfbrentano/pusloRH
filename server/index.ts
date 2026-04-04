@@ -66,7 +66,7 @@ type PrismaUser = {
 };
 
 // --- AUTH MIDDLEWARE ---
-function authenticate(req: Request, res: Response, next: NextFunction): void {
+function authenticateToken(req: Request, res: Response, next: NextFunction): void {
   const authHeader = req.headers.authorization;
   if (!authHeader?.startsWith('Bearer ')) {
     res.status(401).json({ error: 'Unauthorized: missing token' });
@@ -108,7 +108,6 @@ async function seed() {
         name: 'Admin Master',
         role: 'ADMIN',
         departmentId: rhDept?.id,
-        // @ts-expect-error — field added via migration, tsserver cache may lag
         passwordHash,
         avatar:
           'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1287&auto=format&fit=crop',
@@ -119,7 +118,6 @@ async function seed() {
   } else if (!(existing as PrismaUser).passwordHash) {
     // Backfill hash for existing admin without password
     const passwordHash = await bcrypt.hash(defaultPassword, 12);
-    // @ts-expect-error — field added via migration, tsserver cache may lag
     await prisma.user.update({ where: { email: adminEmail }, data: { passwordHash } });
     console.log('✅  Hash adicionado ao admin existente. Senha padrão:', defaultPassword);
   }
@@ -176,7 +174,7 @@ app.post('/api/auth/login', async (req: Request, res: Response): Promise<void> =
 });
 
 // USERS (all protected)
-app.get('/api/users', authenticate, async (_req: Request, res: Response) => {
+app.get('/api/users', authenticateToken, async (_req: Request, res: Response) => {
   try {
     const users = (await prisma.user.findMany({
       include: { department: true },
@@ -188,7 +186,7 @@ app.get('/api/users', authenticate, async (_req: Request, res: Response) => {
   }
 });
 
-app.post('/api/users', authenticate, async (req: Request, res: Response) => {
+app.post('/api/users', authenticateToken, async (req: Request, res: Response) => {
   try {
     const { email, name, role, departmentId, avatar, password } = req.body as {
       email: string;
@@ -200,7 +198,6 @@ app.post('/api/users', authenticate, async (req: Request, res: Response) => {
     };
     const passwordHash = password ? await bcrypt.hash(password, 12) : undefined;
     const user = (await prisma.user.create({
-      // @ts-expect-error — passwordHash exists at runtime after migration
       data: { email, name, role, departmentId, avatar, passwordHash },
       include: { department: true },
     })) as PrismaUser;
@@ -211,7 +208,7 @@ app.post('/api/users', authenticate, async (req: Request, res: Response) => {
   }
 });
 
-app.put('/api/users/:id', authenticate, async (req: Request, res: Response) => {
+app.put('/api/users/:id', authenticateToken, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { name, email, role, departmentId, status, password } = req.body as {
@@ -228,7 +225,6 @@ app.put('/api/users/:id', authenticate, async (req: Request, res: Response) => {
     }
     const user = (await prisma.user.update({
       where: { id: String(id) },
-      // @ts-expect-error — passwordHash field exists at runtime after migration
       data,
       include: { department: true },
     })) as PrismaUser;
@@ -238,7 +234,7 @@ app.put('/api/users/:id', authenticate, async (req: Request, res: Response) => {
   }
 });
 
-app.delete('/api/users/:id', authenticate, async (req: Request, res: Response) => {
+app.delete('/api/users/:id', authenticateToken, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     await prisma.user.delete({ where: { id: String(id) } });
@@ -261,7 +257,7 @@ app.get('/api/departments', async (_req: Request, res: Response) => {
   }
 });
 
-app.post('/api/departments', authenticate, async (req: Request, res: Response) => {
+app.post('/api/departments', authenticateToken, async (req: Request, res: Response) => {
   try {
     const { name, color } = req.body;
     const dept = await prisma.department.create({ data: { name, color } });
@@ -271,7 +267,7 @@ app.post('/api/departments', authenticate, async (req: Request, res: Response) =
   }
 });
 
-app.delete('/api/departments/:id', authenticate, async (req: Request, res: Response) => {
+app.delete('/api/departments/:id', authenticateToken, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const count = await prisma.user.count({ where: { departmentId: String(id) } });
@@ -303,7 +299,7 @@ app.get('/api/surveys/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const survey = await prisma.survey.findUnique({
-      where: { id },
+      where: { id: String(id) },
       include: { questions: true },
     });
     if (!survey) {
@@ -316,7 +312,7 @@ app.get('/api/surveys/:id', async (req: Request, res: Response) => {
   }
 });
 
-app.post('/api/surveys', authenticate, async (req: Request, res: Response) => {
+app.post('/api/surveys', authenticateToken, async (req: Request, res: Response) => {
   try {
     const { title, description, openDate, closeDate, expectedResponses, questions } = req.body;
     const survey = await prisma.survey.create({
@@ -343,7 +339,7 @@ app.post('/api/surveys', authenticate, async (req: Request, res: Response) => {
   }
 });
 
-app.put('/api/surveys/:id', authenticate, async (req: Request, res: Response) => {
+app.put('/api/surveys/:id', authenticateToken, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { title, description, openDate, closeDate, expectedResponses, questions, isActive } =

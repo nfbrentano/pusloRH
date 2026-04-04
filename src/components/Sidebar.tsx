@@ -1,6 +1,15 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Plus, ChevronRight, X, LogOut, Users, Building2 } from 'lucide-react';
+import {
+  LayoutDashboard,
+  Plus,
+  ChevronRight,
+  X,
+  LogOut,
+  Users,
+  Building2,
+  UserCircle2,
+} from 'lucide-react';
 import { ROUTES } from '../routes/config';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -133,7 +142,16 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, isCollapsed = false 
 
       {/* User Profile Area */}
       <div className="mt-auto pt-6 border-t border-outline-variant/10">
-        <div className="bg-surface-container/50 rounded-2xl p-4 flex items-center gap-3 mb-4 border border-outline-variant/5">
+        <NavLink
+          to={ROUTES.PROFILE}
+          className={({ isActive }) =>
+            `bg-surface-container/50 rounded-2xl p-4 flex items-center gap-3 mb-4 border transition-all cursor-pointer group ${
+              isActive
+                ? 'border-primary/20 bg-primary/5'
+                : 'border-outline-variant/5 hover:border-primary/10 hover:bg-primary/5'
+            }`
+          }
+        >
           <div className="w-10 h-10 rounded-xl overflow-hidden border border-white shadow-sm flex-shrink-0">
             <img
               src={
@@ -144,7 +162,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, isCollapsed = false 
               alt="Profile"
             />
           </div>
-          <div className="overflow-hidden">
+          <div className="overflow-hidden flex-1">
             <h4 className="text-sm font-bold text-on-surface truncate">{user?.name}</h4>
             <div className="flex items-center gap-1">
               <span className="text-[8px] font-black uppercase tracking-tighter bg-primary/10 text-primary px-1.5 py-0.5 rounded border border-primary/10">
@@ -153,7 +171,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, isCollapsed = false 
               <p className="text-[10px] text-slate-400 font-medium truncate">{user?.email}</p>
             </div>
           </div>
-        </div>
+          <UserCircle2 className="w-4 h-4 text-slate-300 group-hover:text-primary transition-colors flex-shrink-0" />
+        </NavLink>
 
         <div className="flex flex-col gap-2">
           {canManageSurveys && (
