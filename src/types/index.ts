@@ -22,6 +22,7 @@ export interface Survey {
   expectedResponses: number;
   isActive: boolean;
   createdAt: string;
+  questions?: Question[];
 }
 
 export interface Response {
@@ -59,7 +60,7 @@ export interface User {
   createdAt: string;
 }
 
-export type SurveyInput = Omit<Survey, 'id' | 'createdAt'> & {
+export type SurveyInput = Omit<Survey, 'id' | 'createdAt' | 'questions'> & {
   questions: Omit<Question, 'id' | 'surveyId'>[];
 };
 
