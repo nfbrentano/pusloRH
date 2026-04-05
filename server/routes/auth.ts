@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
 import { sanitizeUser } from '../utils/sanitize.js';
 import { asyncHandler } from '../middleware/errorHandler.js';
+import { authLimiter } from '../middleware/rateLimit.js';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -20,6 +21,7 @@ const JWT_EXPIRES_IN = '6h';
 
 router.post(
   '/login',
+  authLimiter,
   asyncHandler(async (req: Request, res: Response) => {
     const { email, password } = req.body;
     if (!email || !password) {
