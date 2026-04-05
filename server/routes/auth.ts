@@ -7,7 +7,15 @@ import { asyncHandler } from '../middleware/errorHandler.js';
 
 const router = Router();
 const prisma = new PrismaClient();
-const JWT_SECRET = process.env.JWT_SECRET || 'pulsorh-dev-secret-change-in-prod';
+
+const getJwtSecret = (): string => {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error('JWT_SECRET is not defined in environment variables');
+  }
+  return secret;
+};
+
 const JWT_EXPIRES_IN = '6h';
 
 router.post(
@@ -36,7 +44,8 @@ router.post(
       return res.status(401).json({ error: 'Credenciais inválidas.' });
     }
 
-    const token = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET, {
+    const secret = getJwtSecret();
+    const token = jwt.sign({ userId: user.id, role: user.role }, secret, {
       expiresIn: JWT_EXPIRES_IN,
     });
 
