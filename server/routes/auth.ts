@@ -1,13 +1,12 @@
 import { Router, type Request, type Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../utils/prisma.js';
 import { sanitizeUser } from '../utils/sanitize.js';
 import { asyncHandler } from '../middleware/errorHandler.js';
 import { authLimiter } from '../middleware/rateLimit.js';
 
 const router = Router();
-const prisma = new PrismaClient();
 
 const getJwtSecret = (): string => {
   const secret = process.env.JWT_SECRET;

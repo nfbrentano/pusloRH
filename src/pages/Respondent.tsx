@@ -7,7 +7,7 @@ import { isWithinInterval, parseISO, startOfDay, endOfDay } from 'date-fns';
 import { useLocaleStore } from '../store/useLocaleStore';
 import RespondentHeader from '../components/respondent/RespondentHeader';
 import SurveyIntro from '../components/respondent/SurveyIntro';
-import QuestionResponseCard from '../components/respondent/QuestionResponseCard';
+import RespondentField from '../components/survey/RespondentField';
 import RespondentFooter from '../components/respondent/RespondentFooter';
 
 const Respondent: React.FC = () => {
@@ -142,14 +142,14 @@ const Respondent: React.FC = () => {
 
         <form onSubmit={handleSubmit} className="space-y-8">
           {(survey.questions || []).map((q: Question, index: number) => (
-            <QuestionResponseCard
+            <RespondentField
               key={q.id}
               question={q}
               index={index}
               value={answers[q.id]?.value}
               comment={answers[q.id]?.comment}
-              onValueChange={(val) => handleValueChange(q.id, val)}
-              onCommentChange={(comment) => handleCommentChange(q.id, comment)}
+              onValueChange={(val: string | number) => handleValueChange(q.id, val)}
+              onCommentChange={(comment: string) => handleCommentChange(q.id, comment)}
             />
           ))}
 

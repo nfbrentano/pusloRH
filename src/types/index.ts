@@ -22,7 +22,7 @@ export interface Survey {
   expectedResponses: number;
   isActive: boolean;
   createdAt: string;
-  questions?: Question[];
+  questions: Question[];
 }
 
 export interface Response {
@@ -38,6 +38,7 @@ export type Locale = 'pt' | 'en';
 export type TranslationKey = string;
 
 export type UserRole = 'ADMIN' | 'USER' | 'HR';
+export type UserStatus = 'Active' | 'Inactive';
 
 export interface Department {
   id: string;
@@ -54,14 +55,19 @@ export interface User {
   email: string;
   role: UserRole;
   avatar?: string;
-  status: string;
+  status: UserStatus | string;
   departmentId?: string;
   department?: Department;
   createdAt: string;
 }
 
+// Input Types for Mutations
 export type SurveyInput = Omit<Survey, 'id' | 'createdAt' | 'questions'> & {
   questions: Omit<Question, 'id' | 'surveyId'>[];
+};
+
+export type SurveyUpdateInput = Partial<SurveyInput> & {
+  isActive?: boolean;
 };
 
 export type ResponseInput = {
@@ -69,3 +75,9 @@ export type ResponseInput = {
   value: number | string;
   comment?: string;
 };
+
+export type UserInput = Omit<User, 'id' | 'createdAt' | 'department'> & {
+  password?: string;
+};
+
+export type UserUpdateInput = Partial<UserInput>;

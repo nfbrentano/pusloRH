@@ -40,7 +40,7 @@ const QuestionInput: React.FC<QuestionInputProps> = ({ type, value, onChange, di
           ].map((item) => (
             <label
               key={item.val}
-              className={`flex-1 max-w-[160px] ${disabled ? 'cursor-default' : 'cursor-pointer'} group/binary`}
+              className={`flex-1 max-w-[160px] ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'} group/binary`}
             >
               <input
                 type="radio"
@@ -50,7 +50,7 @@ const QuestionInput: React.FC<QuestionInputProps> = ({ type, value, onChange, di
                 checked={value === item.val}
               />
               <div
-                className={`flex flex-col items-center gap-3 p-6 rounded-2xl border-2 transition-all duration-200 ${item.color} ${disabled ? 'opacity-80' : ''}`}
+                className={`flex flex-col items-center gap-3 p-6 rounded-2xl border-2 transition-all duration-200 ${item.color} ${disabled ? 'opacity-60 grayscale-[0.5]' : ''}`}
               >
                 <span className="text-4xl group-hover/binary:scale-110 transition-transform">
                   {item.emoji}
@@ -74,7 +74,7 @@ const QuestionInput: React.FC<QuestionInputProps> = ({ type, value, onChange, di
           ].map((item) => (
             <label
               key={item.val}
-              className={`flex flex-col items-center gap-3 ${disabled ? 'cursor-default' : 'cursor-pointer'} group/likert`}
+              className={`flex flex-col items-center gap-3 ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'} group/likert`}
             >
               <input
                 type="radio"
@@ -83,7 +83,9 @@ const QuestionInput: React.FC<QuestionInputProps> = ({ type, value, onChange, di
                 onChange={() => handleRadioChange(item.val)}
                 checked={value === item.val}
               />
-              <div className="text-3xl md:text-5xl transition-all duration-200 group-hover/likert:scale-125 grayscale hover:grayscale-0 peer-checked:grayscale-0 peer-checked:scale-125">
+              <div
+                className={`text-3xl md:text-5xl transition-all duration-200 group-hover/likert:scale-125 grayscale hover:grayscale-0 peer-checked:grayscale-0 peer-checked:scale-125 ${disabled ? 'grayscale' : ''}`}
+              >
                 {item.emoji}
               </div>
               <span className="text-[9px] md:text-[10px] font-bold text-slate-400 peer-checked:text-primary transition-colors text-center leading-tight h-8 flex items-center justify-center uppercase tracking-tighter">
@@ -106,7 +108,7 @@ const QuestionInput: React.FC<QuestionInputProps> = ({ type, value, onChange, di
           ].map((item) => (
             <label
               key={item.val}
-              className={`flex flex-col items-center gap-3 ${disabled ? 'cursor-default' : 'cursor-pointer'} group/likert`}
+              className={`flex flex-col items-center gap-3 ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'} group/likert`}
             >
               <input
                 type="radio"
@@ -115,7 +117,9 @@ const QuestionInput: React.FC<QuestionInputProps> = ({ type, value, onChange, di
                 onChange={() => handleRadioChange(item.val)}
                 checked={value === item.val}
               />
-              <div className="text-3xl md:text-5xl transition-all duration-200 group-hover/likert:scale-125 opacity-40 hover:opacity-100 peer-checked:opacity-100 peer-checked:scale-125">
+              <div
+                className={`text-3xl md:text-5xl transition-all duration-200 group-hover/likert:scale-125 opacity-40 hover:opacity-100 peer-checked:opacity-100 peer-checked:scale-125 ${disabled ? 'grayscale cursor-not-allowed' : ''}`}
+              >
                 {item.emoji}
               </div>
               <span className="text-[9px] md:text-[10px] font-bold text-slate-400 peer-checked:text-primary transition-colors text-center leading-tight h-8 flex items-center justify-center uppercase tracking-tighter text-wrap">
@@ -138,7 +142,7 @@ const QuestionInput: React.FC<QuestionInputProps> = ({ type, value, onChange, di
           ].map((item) => (
             <label
               key={item.val}
-              className={`flex flex-col items-center gap-3 ${disabled ? 'cursor-default' : 'cursor-pointer'} group/emoji`}
+              className={`flex flex-col items-center gap-3 ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'} group/emoji`}
             >
               <input
                 type="radio"
@@ -147,7 +151,9 @@ const QuestionInput: React.FC<QuestionInputProps> = ({ type, value, onChange, di
                 onChange={() => handleRadioChange(item.val)}
                 checked={value === item.val}
               />
-              <div className="text-4xl md:text-5xl transition-transform duration-200 group-hover/emoji:scale-125 grayscale hover:grayscale-0 peer-checked:grayscale-0 peer-checked:scale-125">
+              <div
+                className={`text-4xl md:text-5xl transition-transform duration-200 group-hover/emoji:scale-125 grayscale hover:grayscale-0 peer-checked:grayscale-0 peer-checked:scale-125 ${disabled ? 'grayscale' : ''}`}
+              >
                 {item.emoji}
               </div>
               <span className="text-[10px] md:text-xs font-medium text-slate-400 peer-checked:text-primary transition-colors uppercase tracking-wider text-center">
@@ -167,7 +173,7 @@ const QuestionInput: React.FC<QuestionInputProps> = ({ type, value, onChange, di
             min="1"
             max="10"
             disabled={disabled}
-            className={`w-full h-2 bg-secondary-container rounded-lg appearance-none ${disabled ? 'cursor-default' : 'cursor-pointer'} accent-secondary`}
+            className={`w-full h-2 bg-secondary-container rounded-lg appearance-none ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'} accent-secondary transition-all`}
             value={(value as number) || 5}
             onChange={(e) => !disabled && onChange && onChange(parseInt(e.target.value))}
           />

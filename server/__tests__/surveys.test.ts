@@ -2,9 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import request from 'supertest';
 import jwt from 'jsonwebtoken';
 import app from '../app.js';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '../utils/prisma.js';
 const JWT_SECRET = 'test-secret-key-for-integration-tests';
 
 describe('Surveys API Integration Tests', () => {

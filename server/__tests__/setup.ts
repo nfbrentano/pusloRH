@@ -1,16 +1,18 @@
 import { beforeAll, afterAll, beforeEach } from 'vitest';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../utils/prisma.js';
 import { execSync } from 'child_process';
 import path from 'path';
 import fs from 'fs';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Load test environment variables
 const TEST_DB_PATH = path.resolve(__dirname, '../../prisma/test.db');
 process.env.DATABASE_URL = `file:${TEST_DB_PATH}`;
 process.env.JWT_SECRET = 'test-secret-key-for-integration-tests';
 process.env.NODE_ENV = 'test';
-
-const prisma = new PrismaClient();
 
 beforeAll(async () => {
   // Ensure the test database is fresh

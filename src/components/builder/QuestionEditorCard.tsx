@@ -11,7 +11,7 @@ import {
 import type { Question, QuestionType } from '../../types';
 import { useLocaleStore } from '../../store/useLocaleStore';
 import InfoTooltip from '../InfoTooltip';
-import QuestionInput from '../SurveyQuestion/QuestionInput';
+import BuilderPreview from '../survey/BuilderPreview';
 
 interface QuestionEditorCardProps {
   question: Omit<Question, 'surveyId'>;
@@ -119,12 +119,7 @@ const QuestionEditorCard: React.FC<QuestionEditorCardProps> = ({
         </div>
 
         {/* Visual Preview */}
-        <div className="col-span-full opacity-60 pointer-events-none scale-95 border border-dashed border-outline-variant/30 rounded-xl p-4 bg-surface-container-low/20">
-          <span className="text-[8px] uppercase tracking-widest font-bold text-slate-400 mb-2 block">
-            {t('common.preview')}
-          </span>
-          <QuestionInput type={question.type} disabled />
-        </div>
+        <BuilderPreview type={question.type} />
 
         <div className="flex items-center justify-between bg-surface-container-low/50 px-5 py-3 rounded-xl border border-dashed border-outline-variant/30">
           <div className="flex items-center gap-3">

@@ -2,9 +2,7 @@ import { describe, it, expect } from 'vitest';
 import request from 'supertest';
 import bcrypt from 'bcryptjs';
 import app from '../app.js';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '../utils/prisma.js';
 
 describe('Auth API Integration Tests', () => {
   it('should login successfully as admin', async () => {
